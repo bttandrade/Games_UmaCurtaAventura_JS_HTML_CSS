@@ -1,0 +1,44 @@
+#container {
+    border: 1px solid black;
+    flex-direction: column;
+    height: 100vh;   
+}
+
+#menu {
+    border: 1px solid black;
+    border-radius: 10px;
+    height: 200px;
+    width: 300px;
+    justify-content: flex-start;
+}
+
+#title {
+    margin: 20px;
+}
+
+#start {
+    border: 3px double black;
+    border-radius: 5px;
+    height: 30px;
+    width: 200px;
+}
+
+#start:hover {
+    box-shadow: inset 0 0 10px 2px gray;
+}
+
+#start:active {
+    background-color: black;
+    color: white;
+}
+
+#description {
+    margin: 20px;
+    text-align: center;
+    font-size: 0.8em;
+}
+
+#footer {
+    position: relative;
+    top: 15px;
+}
