@@ -21,6 +21,7 @@ const hero = {
     gold: 50,
     daysPlaying: 2,
     atualArmor: 'couro',
+    nextLevel: 100,
 }
 
 function template() {};
@@ -39,7 +40,7 @@ const locationMap = [
         ],
     },
     {
-        name: 'covil de goblins',
+        name: 'Entrada do covil de goblins',
         objective: 'Destrua o covil de goblins',
         buttons: [
             { btntxt: 'Entrar covil', btnfunc: template },
@@ -56,12 +57,36 @@ const locationMap = [
         buttons: [
             { btntxt: 'Comprar poção', btnfunc: buyPotion },
             { btntxt: 'Vender poção', btnfunc: sellPotion },
-            { btntxt: 'Comprar livro sobre esgrima', btnfunc: template },
+            { btntxt: 'Comprar treino de espada 2', btnfunc: template },
             { btntxt: '. . .', btnfunc: template },
             { btntxt: '. . .', btnfunc: template },
             { btntxt: 'Voltar', btnfunc: moveToVillageA },
         ]
-    }
+    },
+    {
+        name: 'Covil dos Goblins',
+        objective: 'Destrua o covil de goblins',
+        buttons: [
+            { btntxt: 'Continuar', btnfunc: startCombat },
+            { btntxt: 'Usar poção', btnfunc: usePotion },
+            { btntxt: '. . .', btnfunc: dodge },
+            { btntxt: '. . .', btnfunc: usePotion },
+            { btntxt: '. . .', btnfunc: template },
+            { btntxt: 'Sair', btnfunc: flee },
+        ]
+    },
+    {
+        name: 'combate',
+        objective: 'Destrua o covil de goblins',
+        buttons: [
+            { btntxt: 'Atacar', btnfunc: ataque },
+            { btntxt: 'Defender', btnfunc: defense },
+            { btntxt: 'Esquivar', btnfunc: dodge },
+            { btntxt: 'Usar poção', btnfunc: usePotion },
+            { btntxt: '. . .', btnfunc: template },
+            { btntxt: 'Fugir', btnfunc: flee },
+        ]
+    },
 ];
 
 let currentLocation = 0;
@@ -124,6 +149,19 @@ function training() {
     } else {
         hero.stamina += 30;
         hero.xp += 50;
+        description.innerHTML += '<br>Você ganhou 50xp.';
+        lookForLevelUp()
+    }
+}
+
+function lookForLevelUp() {
+    if (hero.xp >= hero.nextLevel) {
+        hero.level++;
+        hero.xp = 0;
+        hero.nextLevel += 50;
+        description.innerHTML += '<br>Você ganhou 1 level.'
+        updtHeroStats();
+    } else {
         updtHeroStats();
     }
 }
@@ -157,7 +195,6 @@ function showInventory() {
     return '<br>' + inventory.poção + ' poções.' + 
     '<br>Esta usando armadura de ' + hero.atualArmor +
     '<br>Livros: ' + inventory.livros;
-
 }
 
 function seeInventory() {
@@ -184,4 +221,48 @@ function sellPotion() {
         description.innerHTML += '<br>Voce vendeu uma poção.'
         updtHeroStats();
     }
+}
+
+const monsters = [
+    {
+        name: 'goblin',
+        atk: 10,
+        vida: 30,
+    },
+    {
+        name: 'goblin boss',
+        atk: 40,
+        vida: 100,
+    },
+];
+
+function startCombat() {
+    description.innerHTML = 'Voce esta enfrentano um ' + monsters[enemy].name + '.';
+    updateLocation(3);
+}
+
+function ataque() {
+
+}
+
+function defense() {
+
+}
+
+function usePotion() {
+    if (inventory.poção <= 0) {
+        description.innerHTML = '<br>Voce nao possui poções'
+    } else {
+        inventory.poção--;
+        hero.health >= 70 ? hero.health = 100 : hero.health + 30;
+        updtHeroStats();
+    }
+}
+
+function dodge() {
+
+}
+
+function flee() {
+
 }
