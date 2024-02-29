@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/src/styles/global.css">
     <link rel="stylesheet" href="/src/styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <title>Uma Curta Aventura</title>
 </head>
 <body>
-    <main id="container" class="centralize">
+    <main id="container" class="centralize rpgui-cursor-default">
         <!-- <div id="prologue" class="centralize">
             <div id="prologue-box" class="centralize">
                 <div id="text">Você é o heroi portador da espada sagrada e portando e seu dever
@@ -20,18 +21,20 @@
             </div>
         </div> -->
         <div id="menu">
-            <h3 id="location">Vila numero 1</h3>
-            <h3 id="days">1 day</h3>
-            <p id="mission">Objetivo: Destrua o covil de goblins.</p>
+            <div id="location-box">
+                <h3 id="location"></h3>
+                <h3 id="days"></h3>
+            </div>
+            <p id="mission"></p>
             <div id="img-box"><p id="description">Texto</p></div>
             <div id="stats-box" class="centralize">
-                <h5 class="stats" id="lvl">Level: 1</h5>
-                <h5 class="stats" id="health">Vida: 100/100</h5>
-                <h5 class="stats" id="stamina">Cansaço: 0/100</h5>
-                <h5 class="stats" id="gold">Dinheiro: 50g</h5>
-                <button id="invBtn"></button>
+                <div class="eachStatsBox centralize"><h5 class="stats" id="lvl">1</h5><img src="../images/icon003.png" alt="lvl"></div>
+                <div class="eachStatsBox centralize"><h5 class="stats" id="health">Vida 100/100</h5><img src="../images/icon001.png" alt="life"></div>
+                <div class="eachStatsBox centralize"><h5 class="stats" id="stamina">Cansaço 0/100</h5><img src="../images/icon218.png" alt="stamina"></div>
+                <div class="eachStatsBox centralize"><h5 class="stats" id="gold">Dinheiro 50g</h5><img src="../images/icon362.png" alt="gold"></div>
+                <button id="invBtn"><img src="../images/icon009.png" alt="inventory"></button>
             </div>
-            <div id="buttons">
+            <div id="buttons" class="centralize">
                 <button class="btn" id="btn1"></button>
                 <button class="btn" id="btn2"></button>
                 <button class="btn" id="btn3"></button>
