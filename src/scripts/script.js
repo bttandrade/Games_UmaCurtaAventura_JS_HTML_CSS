@@ -21,34 +21,36 @@ const hero = {
     xp: 0,
     gold: 150,
     daysPlaying: 2,
-    atualArmor: 'couro',
+    atualArmor: 'Couro(def+2)',
     nextLevel: 100,
     damage: 10,
     dodgeBuff: false,
 }
 
+let trainingXp = 20;
+
 function template() {};
 
 const locationMap = [
     {
-        location: "arredores de A",
-        objective: 'Destrua o covil de goblins',
+        location: "Floresta.",
+        objective: 'Destrua o covil de goblins.',
         places: [
             {
-                name: 'vila numero 1',
+                name: 'Vila da Floresta.',
                 buttons: [
                     { btntxt: 'Ir ao covil', btnfunc: moveToCovil },
                     { btntxt: 'Treinar', btnfunc: training },
-                    { btntxt: 'Descansar', btnfunc: recover },
-                    { btntxt: 'Visitar a loja', btnfunc: moveToShop },
+                    { btntxt: 'Dormir', btnfunc: recover },
+                    { btntxt: 'Ir a loja', btnfunc: moveToShop },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                 ],
             },
             {
-                name: 'Entrada do covil de goblins',
+                name: 'Entrada do covil.',
                 buttons: [
-                    { btntxt: 'Entrar covil', btnfunc: covilFight },
+                    { btntxt: 'Entrar no covil', btnfunc: covilFight },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
@@ -57,7 +59,7 @@ const locationMap = [
                 ],
             },
             {
-                name: 'loja de suprimentos',
+                name: 'Loja de Suprimentos.',
                 buttons: [
                     { btntxt: 'Comprar poção', btnfunc: buyPotion },
                     { btntxt: 'Vender poção', btnfunc: sellPotion },
@@ -68,7 +70,7 @@ const locationMap = [
                 ]
             },
             {
-                name: 'Covil dos Goblins',
+                name: 'Covil dos Goblins.',
                 buttons: [
                     { btntxt: 'Continuar', btnfunc: fightingCovil },
                     { btntxt: 'Usar poção', btnfunc: usePotion },
@@ -79,7 +81,7 @@ const locationMap = [
                 ]
             },
             {
-                name: 'combate',
+                name: 'Em combate.',
                 buttons: [
                     { btntxt: 'Atacar', btnfunc: atack },
                     { btntxt: 'Esquivar', btnfunc: dodge },
@@ -89,14 +91,25 @@ const locationMap = [
                     { btntxt: 'Fugir', btnfunc: flee },
                 ]
             },
+            {
+                name: '',
+                buttons: [
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                ]
+            },
         ]
     },
     {
-        location: "arredores de B",
-        objective: 'Destrua o acampamento orc',
+        location: "Montanha.",
+        objective: 'Destrua o Acampamento Orc.',
         places: [
             {
-                name: 'vila numero 2',
+                name: 'Vila das Montanhas.',
                 buttons: [
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
@@ -129,21 +142,28 @@ function startGame() {
     updtHeroStats();
 }
 
+function resetTxt() {
+    description.innerHTML = "";
+}
+
 function moveToVillageA() {
+    resetTxt();
     updateLocation(0, 0);
 }
 
 function moveToCovil() {
+    resetTxt();
     updateLocation(0, 1);
 }
 
 function moveToShop() {
+    resetTxt();
     updateLocation(0, 2);
 }
 
 function updateLocation(location, place) {
-    //description.innerText = `Você esta em: ${locationMap[location].name}.`
-    description.innerText = '';
+    description.innerText += `Você está em: ${locationMap[location].places[place].name}`
+    //description.innerText = '';
     setTxt(location, place);
     changeButtons(location, place);
 }
@@ -171,11 +191,11 @@ function updtHeroStats() {
 
 function training() {
     if (hero.stamina + 30 >= 100) {
-        description.innerHTML += '<br>Você esta cansado demais.';
+        description.innerHTML += '<br>Você está cansado demais.';
     } else {
         hero.stamina += 30;
         hero.xp += 20;
-        description.innerHTML += '<br>Você ganhou 50xp.';
+        description.innerHTML += `<br>Você ganhou ${trainingXp}xp.`;
         lookForLevelUp()
     }
 }
@@ -214,57 +234,59 @@ const inventory = {
     armaduras: [
         {
             name: 'couro',
-            def: 10,
+            def: 2,
         }
     ],
     livros: [ 
-        'treino de espada',
-        'treino de arco',
+        'Livro Sobre Espada I',
     ]
 }
 
 function showInventory() {
-    return '<br>' + inventory.poção + ' poções.' + 
-    '<br>Esta usando armadura de ' + hero.atualArmor +
-    '<br>Livros: ' + inventory.livros;
+    if (inventory.poção === 1) {
+        return `<br>${inventory.poção} Poção.<br>${inventory.livros}`
+    } else {
+        return `<br>${inventory.poção} Poções.<br>${inventory.livros}`
+    }
 }
 
 function seeInventory() {
-    description.innerHTML += '<br>Você possui:' + showInventory();
+    description.innerHTML += `<br>Você está usando uma Armadura de ${hero.atualArmor}.`
+    description.innerHTML += '<br>Você abre a mochila e vê:' + showInventory();
 }
 
 invBtn.onclick = seeInventory;
 
 function buyPotion() {
     if (hero.gold < 50) {
-        description.innerHTML += '<br>Voce nao tem dinheiro suficiente.'
+        description.innerHTML += '<br>Você não tem ouro suficiente.'
     } else {
         hero.gold -= 50;
         inventory.poção++;
-        description.innerHTML += '<br>Voce comprou uma poção.'
+        description.innerHTML += '<br>Você comprou uma poção.'
         updtHeroStats();
     }
 }
 
 function sellPotion() {
     if (inventory.poção <= 0) {
-        description.innerHTML += '<br>Voce nao tem poções para vender.'
+        description.innerHTML += '<br>Você não tem poções para vender.'
     } else {
         hero.gold += 50;
         inventory.poção--;
-        description.innerHTML += '<br>Voce vendeu uma poção.'
+        description.innerHTML += '<br>Você vendeu uma poção.'
         updtHeroStats();
     }
 }
 
 const monsters = [
     {
-        name: 'goblin',
+        name: 'Goblin',
         atk: 10,
         vida: 30,
     },
     {
-        name: 'goblin boss',
+        name: 'Goblin Chefe',
         atk: 40,
         vida: 100,
     },
@@ -277,6 +299,7 @@ let goblinsKilled;
 
 function covilFight() {
     goblinsKilled = 0;
+    resetTxt();
     updateLocation(0, 3);
     dungeon = 0;
 }
@@ -296,20 +319,27 @@ function fighting() {
     if (hero.stamina <= 80) {
         hero.stamina += 10 - hero.level;
         updtHeroStats();
-        startCombat();
+        battle();
     } else {
-        description.innerHTML = "<br>Voce esta muito cansado";
+        description.innerHTML += "<br>Você está muito cansado.";
     }
 }
 
-function startCombat() {
-    console.log(hero.damage);
+function battle() {
+    //console.log(hero.damage);
     if (currentMonsterLife <= 0) {
-        updateLocation(0, 3);
-        description.innerHTML = 'Voce derrotou um ' + monsters[currentMonsterFight].name + '.';
+        description.innerHTML += '<br>Você derrotou um ' + monsters[currentMonsterFight].name + '.';
+        changeButtons(0, 5);
+        setTimeout(() => {
+            resetTxt();
+            updateLocation(0, 3);
+        }, 1000);
+        //updateLocation(0, 3);
         if (currentMonsterFight == 1) {
-            alert('Voce terminou a parte 1');
-            window.location.href = '/./index.html';
+            alert('Você terminou a parte 1');
+            resetTxt();
+            updateLocation(1, 0);
+            return;
         }
         goblinsKilled++;
         console.log(goblinsKilled);
@@ -317,29 +347,33 @@ function startCombat() {
         lookForLevelUp();
     } else {
         updateLocation(0, 4);
-        description.innerHTML = 'Voce esta enfrentando um ' + monsters[currentMonsterFight].name + '.';
+        resetTxt();
+        description.innerHTML += 'Você está enfrentando um ' + monsters[currentMonsterFight].name + '.';
         addMonster();
     }
 }
 
 function atack() {
     if (hero.dodgeBuff) {
+        description.innerHTML += `<br>Você causou ${hero.damage*2} de dano.`;
         currentMonsterLife -= hero.damage*2;
         hero.dodgeBuff = false;
     } else {
+        description.innerHTML += `<br>Você causou ${hero.damage} de dano.`
         currentMonsterLife -= hero.damage;
     }
     if (currentMonsterLife > 0) {
         monsterAtk();
-        description.innerHTML += `<br>Voce recebeu ${monsters[currentMonsterFight].atk} de dano`;
+    } else {
+        battle();
     }
-    startCombat();
 }
 
 function usePotion() {
     if (inventory.poção <= 0) {
-        description.innerHTML += '<br>Voce nao possui poções'
+        description.innerHTML += '<br>Você não possui poções.'
     } else {
+        description.innerHTML += '<br>Você recuperou 30 de Vida.'
         inventory.poção--;
         hero.health >= 70 ? hero.health = 100 : hero.health += 30;
         updtHeroStats();
@@ -350,10 +384,11 @@ function dodge() {
     let random = Math.floor(Math.random() * 2);
     //console.log(random);
     if (random === 0) {
+        description.innerHTML += `<br>Você não consegue esquivar.`;
         monsterAtk();
     } else {
         hero.dodgeBuff = true;
-        description.innerHTML += `<br>Voce esquivou e seu proximo atk sera critico`;
+        description.innerHTML += `<br>Você esquivou e seu próximo ataque será crítico.`;
     }
 }
 
@@ -363,7 +398,7 @@ function flee() {
         updateLocation(0, 3);
     } else {
         monsterAtk();
-        description.innerHTML += `<br>Voce recebeu ${monsters[currentMonsterFight].atk} de dano`;
+        description.innerHTML += `<br>Você recebeu ${monsters[currentMonsterFight].atk} de dano.`;
     }
 }
 
@@ -377,9 +412,16 @@ function addMonster() {
 
 function monsterAtk() {
     hero.health -= monsters[currentMonsterFight].atk;
+    description.innerHTML += `<br>Você recebeu ${monsters[currentMonsterFight].atk} de dano.`;
+        setTimeout(() => {
+            //resetTxt();
+            //updateLocation(0, 4);
+            battle();
+        }, 1000);
     updtHeroStats();
     if (hero.health <= 0) {
         alert('derrota');
         window.location.href = '/./index.html'
     }
+    //battle();
 }

@@ -41,6 +41,7 @@
 }
 
 #img-box {
+    overflow: scroll;
     border: 1px solid black;
     width: 380px;
     height: 280px;
@@ -75,20 +76,11 @@
     border: 1px solid black;
 }
 
-.btn:hover,  #invBtn:hover {
+.btn:hover, #advance:hover,  #invBtn:hover {
     box-shadow: inset 0 0 10px 2px gray;
 }
 
-.btn:active,  #invBtn:active {
-    background-color: black;
-    color: white;
-}
-
-#advance:hover {
-    box-shadow: inset 0 0 10px 2px gray;
-}
-
-#advance:active {
+.btn:active, #advance:hover, #advance:active,  #invBtn:active {
     background-color: black;
     color: white;
 }
