@@ -19,11 +19,12 @@ const hero = {
     stamina: 0,
     maxStamina: 100,
     xp: 0,
-    gold: 150,
+    gold: 50,
     daysPlaying: 1,
-    atualArmor: 'Couro(def+2)',
+    armor: 'Couro (def: 2)',
+    def: 2,
     nextLevel: 100,
-    damage: 10,
+    damage: 4,
     arco: false,
     dodgeBuff: false,
 }
@@ -45,7 +46,7 @@ const locationMap = [
                     { btntxt: 'Dormir', btnfunc: recover },
                     { btntxt: 'Ir a loja', btnfunc: moveToShopA },
                     { btntxt: '. . .', btnfunc: template },
-                    { btntxt: 'Ir a taverna', btnfunc: template },
+                    { btntxt: 'Ir a taverna', btnfunc: moveToTabernA },
                 ],
             },
             {
@@ -66,7 +67,7 @@ const locationMap = [
                     { btntxt: 'Vender poção', btnfunc: sellPotion },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
-                    { btntxt: 'Comprar Livro Sobre Espada II', btnfunc: buyBook1 },
+                    { btntxt: 'Comprar Livro Sobre Espada II', btnfunc: buyBookSword2 },
                     { btntxt: 'Voltar', btnfunc: moveToVillageA },
                 ]
             },
@@ -103,6 +104,17 @@ const locationMap = [
                     { btntxt: '. . .', btnfunc: template },
                 ]
             },
+            {
+                name: 'Taverna',
+                buttons: [
+                    { btntxt: 'Pedir cerveja', btnfunc: buyBeer },
+                    { btntxt: 'Escutar conversas', btnfunc: listen },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageA },
+                ]
+            },
         ]
     },
     {
@@ -124,15 +136,56 @@ const locationMap = [
     },
 ];
 
-function buyBook1() {
-    inventory.livros.push('Livro Sobre Espada II');
-    console.log(inventory.livros);
-    hero.damage *= 1.1;
-    description.innerHTML += '<br>Você comprou o Livro Sobre Espada II.<br>Seu dano aumentou.'
-    btns[4].textContent = '. . .';
-    btns[4].onclick = template;
-    hero.gold -= 150;
-    updtHeroStats();
+function buyBookSword2() {
+    if (hero.gold >= 150) {
+        inventory.livros.push('Livro Sobre Espada II');
+        //console.log(inventory.livros);
+        hero.damage += 10;
+        description.innerHTML += '<br>Você comprou o Livro Sobre Espada II.<br>Seu dano aumentou.'
+        btns[4].textContent = '. . .';
+        btns[4].onclick = template;
+        hero.gold -= 150;
+        updtHeroStats();
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.'
+    }
+}
+
+function buyBeer() {
+    if (hero.stamina > 0) {
+        if (hero.gold >= 30) {
+            description.innerHTML += '<br>Você comprou uma cerveja e se sente revigorado.'
+            hero.gold -= 30;
+            if (hero.stamina < 20) {
+                hero.stamina = 0;
+                updtHeroStats();
+            } else {
+                hero.stamina -= 20;
+                updtHeroStats();
+            }
+        } else {
+            description.innerHTML += '<br>Você não tem ouro suficiente.'
+        }
+    } else {
+        description.innerHTML += '<br>Você não precisa relaxar.'
+    }
+}
+
+function listen() {
+    resetTxt();
+    updateLocation(0, 6)
+    let random = Math.floor(Math.random() * 3);
+    if (random === 1) {
+        description.innerHTML += '<br>Você começa a escutar algumas conversas.' +
+        '<br>Homem A: ... que há um Goblin Chefe no fundo do covil.' +
+        '<br>Homem B: Também ouvi falar nisso, mas parece que para chamar a atenção dele, ' +  
+        'tem que derrotar pelo menos 10 goblins.' +
+        '<br>Homem A: Quem seria louco de ir tão fundo.'
+    } else {
+        description.innerHTML += '<br>Você começa a escutar algumas conversas.' +
+        '<br>Homem A: ... que um goblin matou duas ovelhas de meu vizinho.' +
+        '<br>Homem B: Até quando vamos sofrer com essas pragas.'
+    }
 }
 
 //  let currentLocation = 0;
@@ -152,6 +205,11 @@ updtHeroStats();
 function startGame() {
     moveToVillageA();
     updtHeroStats();
+}
+
+function getRandNumb() {
+    let random = Math.floor(Math.random() * 10); 
+    return random;
 }
 
 function resetTxt() {
@@ -184,6 +242,11 @@ function moveToShopA() {
     }
 }
 
+function moveToTabernA() {
+    resetTxt();
+    updateLocation(0, 6);
+}
+
 function updateLocation(location, place) {
     description.innerText += `Você está em: ${locationMap[location].places[place].name}`
     //description.innerText = '';
@@ -210,11 +273,11 @@ function updtHeroStats() {
     levelTxt.innerText = hero.level;
     healthTxt.innerText = `${hero.health}/${hero.maxHealth}`;
     staminaTxt.innerText = `${hero.stamina}/${hero.maxStamina}`;
-    goldTxt.innerText = hero.gold;
+    goldTxt.innerText = `${hero.gold}g`;
 }
 
 function training() {
-    if (hero.stamina + 30 >= 100) {
+    if (hero.stamina + 30 >= hero.maxStamina) {
         description.innerHTML += '<br>Você está cansado demais.';
     } else {
         hero.stamina += 30;
@@ -229,8 +292,10 @@ function lookForLevelUp() {
         hero.level++;
         hero.xp = 0;
         hero.nextLevel += 50;
-        description.innerHTML += '<br>Você ganhou 1 level.'
-        hero.damage = 10 * hero.level 
+        description.innerHTML += '<br>Você ganhou 1 level.';
+        hero.damage += 5;
+        hero.maxHealth += 10;
+        hero.maxStamina += 5;
         updtHeroStats();
     } else {
         updtHeroStats();
@@ -243,8 +308,8 @@ function recover() {
     } else {
         description.innerHTML += '<br>Você decide dormir por hoje.';
         hero.stamina = 0;
-        if (hero.health > 50) {
-            hero.health = 100;
+        if (hero.health + 50 >= hero.maxHealth) {
+            hero.health = hero.maxHealth;
         } else {
             hero.health += 50;
         }
@@ -284,7 +349,8 @@ function showBooks() {
 }
 
 function seeInventory() {
-    description.innerHTML += `<br>Você está usando uma Armadura de ${hero.atualArmor}.`
+    description.innerHTML += `<br>Você possui a Espada Sagrada (dano médio: ${hero.damage + 4}).`
+    description.innerHTML += `<br>Você está usando uma Armadura de ${hero.armor}.`
     description.innerHTML += '<br>Você abre a mochila e vê:' + showInventory();
 }
 
@@ -315,13 +381,17 @@ function sellPotion() {
 const monsters = [
     {
         name: 'Goblin',
-        atk: 10,
-        vida: 30,
+        atk: 4,
+        vida: 40,
+        xp: 20,
+        gold: 10,
     },
     {
         name: 'Goblin Chefe',
-        atk: 40,
-        vida: 100,
+        atk: 30,
+        vida: 150,
+        xp: 60,
+        gold: 80,
     },
 ];
 
@@ -336,7 +406,7 @@ function covilFight() {
 }
 
 function fightingCovil() {
-    if (goblinsKilled > 10) {
+    if (goblinsKilled > 9) {
         currentMonsterFight = 1;
         fighting();
     } else {
@@ -347,8 +417,8 @@ function fightingCovil() {
 
 function fighting() {
     currentMonsterLife = monsters[currentMonsterFight].vida;
-    if (hero.stamina <= 80) {
-        hero.stamina += 10 - hero.level;
+    if (hero.stamina <= hero.maxStamina - 20) {
+        hero.stamina += 20;
         updtHeroStats();
         battle();
     } else {
@@ -359,12 +429,16 @@ function fighting() {
 function battle() {
     //console.log(hero.damage);
     if (currentMonsterLife <= 0) {
+        let getGold = monsters[currentMonsterFight].gold + getRandNumb();
+        let getXp = (monsters[currentMonsterFight].xp - hero.level*4) + getRandNumb();
+        getXp < 0 ? getXp = 0 : getXp;
         description.innerHTML += '<br>Você derrotou um ' + monsters[currentMonsterFight].name + '.';
+        description.innerHTML += `<br>Você ganhou ${getXp} de xp e ${getGold} de ouro.`;
         changeButtons(0, 5);
         setTimeout(() => {
             resetTxt();
             updateLocation(0, 3);
-        }, 1000);
+        }, 1500);
         //updateLocation(0, 3);
         if (currentMonsterFight == 1) {
             alert('Você terminou a parte 1');
@@ -373,8 +447,9 @@ function battle() {
             return;
         }
         goblinsKilled++;
-        console.log(goblinsKilled);
-        hero.xp += 30;
+        //console.log(goblinsKilled);
+        hero.xp += getXp;
+        hero.gold += getGold;
         lookForLevelUp();
     } else {
         updateLocation(0, 4);
@@ -385,13 +460,14 @@ function battle() {
 }
 
 function attack() {
+    let heroAtk = hero.damage + getRandNumb();
     if (hero.dodgeBuff) {
-        description.innerHTML += `<br>Você causou ${hero.damage*2} de dano.`;
-        currentMonsterLife -= hero.damage*2;
+        description.innerHTML += `<br>Você causou ${heroAtk*2} de dano.`;
+        currentMonsterLife -= heroAtk*2;
         hero.dodgeBuff = false;
     } else {
-        description.innerHTML += `<br>Você causou ${hero.damage} de dano.`
-        currentMonsterLife -= hero.damage;
+        description.innerHTML += `<br>Você causou ${heroAtk} de dano.`
+        currentMonsterLife -= heroAtk;
     }
     if (currentMonsterLife > 0) {
         monsterTurn();
@@ -404,9 +480,9 @@ function usePotion() {
     if (inventory.poção <= 0) {
         description.innerHTML += '<br>Você não possui poções.'
     } else {
-        description.innerHTML += '<br>Você recuperou 30 de Vida.'
         inventory.poção--;
-        hero.health >= 70 ? hero.health = 100 : hero.health += 30;
+        hero.health >= hero.maxHealth - 30 ? hero.health = hero.maxHealth : hero.health += 30;
+        hero.health == hero.maxHealth ? description.innerHTML += '<br>Você ficou com a Vida cheia.' : description.innerHTML += '<br>Você recuperou 30 de Vida.';
         updtHeroStats();
     }
 }
@@ -435,11 +511,11 @@ function flee() {
 }
 
 function gameOver() {
-    alert('derrota');
+    alert('Você morreu!');
 }
 
 function addMonster() {
-    description.innerHTML += `<br>Vida: ${currentMonsterLife}.` 
+    description.innerHTML += `<br><img src="../images/icon001.png" alt="life"> ${currentMonsterLife}` 
 }
 
 function monsterTurn() {
@@ -448,12 +524,13 @@ function monsterTurn() {
 }
 
 function monsterSpecial() {
+    let monsterDmg = monsters[currentMonsterFight].atk + getRandNumb() - hero.def;
     changeButtons(0, 5);
     setTimeout(() => {
         description.innerHTML += `<br>${monsters[currentMonsterFight].name} lhe acerta na cabeça.`;
-        description.innerHTML += `<br>Você recebeu ${monsters[currentMonsterFight].atk*2} de dano.`;
+        description.innerHTML += `<br>Você recebeu ${monsterDmg*2} de dano.`;
         setTimeout(() => {
-            hero.health -= monsters[currentMonsterFight].atk*2;
+            hero.health -= monsterDmg*2;
                 //resetTxt();
                 battle();
                 updtHeroStats();
@@ -461,18 +538,19 @@ function monsterSpecial() {
                     alert('derrota');
                     window.location.href = '/./index.html'
                 }
-            }, 1000);
+            }, 1500);
     }, 1000);
     //battle();
 }
 
 function monsterAtk() {
+    let monsterDmg = monsters[currentMonsterFight].atk + getRandNumb() - hero.def;
     changeButtons(0, 5);
     setTimeout(() => {
         description.innerHTML += `<br>${monsters[currentMonsterFight].name} lhe ataca.`;
-        description.innerHTML += `<br>Você recebeu ${monsters[currentMonsterFight].atk} de dano.`;
+        description.innerHTML += `<br>Você recebeu ${monsterDmg} de dano.`;
         setTimeout(() => {
-            hero.health -= monsters[currentMonsterFight].atk;
+            hero.health -= monsterDmg;
                 //resetTxt();
                 battle();
                 updtHeroStats();
@@ -480,7 +558,7 @@ function monsterAtk() {
                     alert('derrota');
                     window.location.href = '/./index.html'
                 }
-            }, 1000);
+            }, 1500);
     }, 1000);
     //battle();
 }
