@@ -54,6 +54,10 @@
     gap: 10px;
 }
 
+#mission {
+    text-align: center;
+}
+
 #img-box {
     font-size: 0.9em;
     overflow: auto;

@@ -19,14 +19,17 @@ const hero = {
     stamina: 0,
     maxStamina: 100,
     xp: 0,
-    gold: 50,
+    gold: 1000,
     daysPlaying: 1,
     armor: 'Couro (def: 2)',
     def: 2,
     nextLevel: 100,
-    damage: 4,
-    arco: false,
+    damage: 400,
+    arrowDmg: 30,
+    chanceToShoot: 4,
+    bow: false,
     dodgeBuff: false,
+    dodgeChance: 3,
 }
 
 let trainingXp = 20;
@@ -36,7 +39,7 @@ function template() {};
 const locationMap = [
     {
         location: "Floresta",
-        objective: 'Missão: Destrua o covil de goblins',
+        objective: 'Missão: Destrua o covil dos lobos selvagens',
         places: [
             {
                 name: 'Vila da Floresta.',
@@ -72,12 +75,12 @@ const locationMap = [
                 ]
             },
             {
-                name: 'Covil dos Goblins.',
+                name: 'Covil dos lobos selvagens.',
                 buttons: [
                     { btntxt: 'Continuar', btnfunc: fightingCovil },
                     { btntxt: 'Usar poção', btnfunc: usePotion },
-                    { btntxt: '. . .', btnfunc: dodge },
-                    { btntxt: '. . .', btnfunc: usePotion },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: 'Sair', btnfunc: moveToCovil },
                 ]
@@ -108,7 +111,18 @@ const locationMap = [
                 name: 'Taverna',
                 buttons: [
                     { btntxt: 'Pedir cerveja', btnfunc: buyBeer },
-                    { btntxt: 'Escutar conversas', btnfunc: listen },
+                    { btntxt: 'Escutar conversas', btnfunc: listenTabernA },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageA },
+                ]
+            },
+            {
+                name: 'Fundo do covil.',
+                buttons: [
+                    { btntxt: 'Enfrentar o Lobo Selvagem Gigante', btnfunc: fighting },
+                    { btntxt: 'Usar poção', btnfunc: usePotion },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
@@ -119,10 +133,65 @@ const locationMap = [
     },
     {
         location: "Montanha",
-        objective: 'Missão: Destrua o Acampamento Orc',
+        objective: 'Missão: Mate todos os Trolls 0/4',
         places: [
             {
-                name: 'Vila das Montanhas.',
+                name: 'Vila da Montanha.',
+                buttons: [
+                    { btntxt: 'Explorar os arredores', btnfunc: exploreMontain },
+                    { btntxt: 'Treinar', btnfunc: training },
+                    { btntxt: 'Dormir', btnfunc: recover },
+                    { btntxt: 'Ir a loja', btnfunc: moveToShopB },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Ir a taverna', btnfunc: moveToTabernB },
+                ],
+            },
+            {
+                name: 'Loja de Suprimentos.',
+                buttons: [
+                    { btntxt: 'Comprar poção', btnfunc: buyPotion },
+                    { btntxt: 'Vender poção', btnfunc: sellPotion },
+                    { btntxt: 'Comprar Arco e Flechas', btnfunc: buyBow },
+                    { btntxt: 'Comprar Livro Sobre Espada III', btnfunc: buyBookSword3 },
+                    { btntxt: 'Comprar Livro Sobre Arco I', btnfunc: buyBookBow1 },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageB },
+                ]
+            },
+            {
+                name: 'Taverna',
+                buttons: [
+                    { btntxt: 'Pedir cerveja', btnfunc: buyBeer },
+                    { btntxt: 'Escutar conversas', btnfunc: listenTabernB },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageB },
+                ]
+            },
+            {
+                name: 'Arredores da Montanha.',
+                buttons: [
+                    { btntxt: 'Explorar', btnfunc: fightingMontain },
+                    { btntxt: 'Usar poção', btnfunc: usePotion },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageB },
+                ],
+            },
+            {
+                name: 'Em combate.',
+                buttons: [
+                    { btntxt: 'Atacar', btnfunc: attack },
+                    { btntxt: 'Esquivar', btnfunc: dodge },
+                    { btntxt: 'Usar poção', btnfunc: usePotion },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Fugir', btnfunc: flee },
+                ]
+            },
+            {
+                name: '',
                 buttons: [
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
@@ -130,7 +199,7 @@ const locationMap = [
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
-                ],
+                ]
             },
         ]
     },
@@ -138,16 +207,67 @@ const locationMap = [
 
 function buyBookSword2() {
     if (hero.gold >= 150) {
-        inventory.livros.push('Livro Sobre Espada II');
-        //console.log(inventory.livros);
-        hero.damage += 10;
-        description.innerHTML += '<br>Você comprou o Livro Sobre Espada II.<br>Seu dano aumentou.'
-        btns[4].textContent = '. . .';
-        btns[4].onclick = template;
+        buyBook('Livro Sobre Espada II', 4);
         hero.gold -= 150;
+        hero.damage += 10;
         updtHeroStats();
     } else {
-        description.innerHTML += '<br>Você não tem ouro suficiente.'
+        description.innerHTML += '<br>Você não tem ouro suficiente.';
+    }
+}
+
+function buyBookSword3() {
+    if (hero.gold >= 150) {
+        buyBook('Livro Sobre Espada III', 3);
+        hero.gold -= 150;
+        hero.damage += 10;
+        updtHeroStats();
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.';
+    }
+}
+
+function buyBookSword4() {
+    
+}
+
+function buyBookBow1() {
+    if (hero.gold >= 150) {
+        buyBook('Livro Sobre Arco I', 4);
+        hero.gold -= 150;
+        hero.arrowDmg += 10;
+        hero.chanceToShoot = 3;
+        updtHeroStats();
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.';
+    }
+}
+
+function buyBookBow2() {
+    
+}
+
+function buyBookDodge() {
+    
+}
+
+function buyBook(name, button) {
+    inventory.livros.push(name);
+    //console.log(inventory.livros);
+    description.innerHTML += `<br>Você comprou o ${name}.<br>Seu dano aumentou.`
+    btns[button].textContent = '. . .';
+    btns[button].onclick = template;
+}
+
+function buyBow() {
+    if (hero.gold >= 100) {
+        description.innerHTML += '<br>Você comprou um arco com flechas.';
+        btns[2].textContent = '. . .';
+        btns[2].onclick = template;
+        hero.gold -= 100;
+        hero.bow = true;
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.';
     }
 }
 
@@ -171,28 +291,56 @@ function buyBeer() {
     }
 }
 
-function listen() {
+function listenTabernA() {
     resetTxt();
     updateLocation(0, 6)
     let random = Math.floor(Math.random() * 3);
     if (random === 1) {
         description.innerHTML += '<br>Você começa a escutar algumas conversas.' +
-        '<br>Homem A: ... que há um Goblin Chefe no fundo do covil.' +
-        '<br>Homem B: Também ouvi falar nisso, mas parece que para chamar a atenção dele, ' +  
-        'tem que derrotar pelo menos 10 goblins.' +
+        '<br>Homem A: ... que há um Lobo Selvagem Gigante no fundo do covil.' +
+        '<br>Homem B: Também ouvi falar nisso, mas parece que para chegar a ele, ' +  
+        'tem que derrotar pelo menos 10 lobos selvagens.' +
         '<br>Homem A: Quem seria louco de ir tão fundo.'
     } else {
         description.innerHTML += '<br>Você começa a escutar algumas conversas.' +
-        '<br>Homem A: ... que um goblin matou duas ovelhas de meu vizinho.' +
+        '<br>Homem A: ... que um lobo selvagem matou duas ovelhas de meu vizinho.' +
         '<br>Homem B: Até quando vamos sofrer com essas pragas.'
     }
 }
 
-//  let currentLocation = 0;
+function moveToShopB() {
+    resetTxt();
+    updateLocation(1, 1);
+    description.innerHTML += '<br>Você olha a loja e vê:<br>Um estoque de Poções.';
+    lookForStuff(1);
+}
+
+function listenTabernB() {
+    resetTxt();
+    updateLocation(1, 2)
+    let random = Math.floor(Math.random() * 3);
+    if (random === 1) {
+        description.innerHTML += '<br>Texto';
+    } else {
+        description.innerHTML += '<br>Texto';
+    }
+}
+
+function moveToTabernB() {
+    resetTxt();
+    updateLocation(1, 2);
+}
+
+function exploreMontain() {
+    resetTxt();
+    updateLocation(1, 3);
+}
+
+let currentLocation;
 
 const btns = document.getElementsByClassName('btn');
 
-// advance.addEventListener('click', () => {
+// advance.addEventlistenTabernAer('click', () => {
 //     prologue.style.display = 'none';
 //     //alert('funciona');
 //     startGame();
@@ -203,8 +351,14 @@ startGame();
 updtHeroStats();
 
 function startGame() {
-    moveToVillageA();
+    moveToVillageB();
     updtHeroStats();
+}
+
+function moveToVillageB() {
+    resetTxt();
+    updateLocation(1, 0);
+    currentLocation = 1;
 }
 
 function getRandNumb() {
@@ -219,6 +373,7 @@ function resetTxt() {
 function moveToVillageA() {
     resetTxt();
     updateLocation(0, 0);
+    currentLocation = 0;
 }
 
 function moveToCovil() {
@@ -226,20 +381,50 @@ function moveToCovil() {
     updateLocation(0, 1);
 }
 
+function lookForStuff(shop) {
+    if (shop == 0) {
+        if (inventory.livros.indexOf('Livro Sobre Espada II') != -1) {
+            btns[4].textContent = '. . .';
+            btns[4].onclick = template;
+            //console.log(inventory.livros);
+        } else {
+            description.innerHTML += '<br>Livro Sobre Espada II.';
+            //console.log(inventory.livros);
+        }
+    } else if(shop == 1) {
+        if (hero.bow) {
+            btns[2].textContent = '. . .';
+            btns[2].onclick = template;
+            //console.log(inventory.livros);
+        } else {
+            description.innerHTML += '<br>Arco com flechas.';
+            //console.log(inventory.livros);
+        }
+        if (inventory.livros.indexOf('Livro Sobre Espada III') != -1) {
+            btns[3].textContent = '. . .';
+            btns[3].onclick = template;
+            //console.log(inventory.livros);
+        } else {
+            description.innerHTML += '<br>Livro Sobre Espada III.';
+            //console.log(inventory.livros);
+        }
+        if (inventory.livros.indexOf('Livro Sobre Arco I') != -1) {
+            btns[4].textContent = '. . .';
+            btns[4].onclick = template;
+            //console.log(inventory.livros);
+        } else {
+            description.innerHTML += '<br>Livro Sobre Arco I.';
+            //console.log(inventory.livros);
+        }
+    }
+}
+
 function moveToShopA() {
     resetTxt();
     updateLocation(0, 2);
-    console.log(!inventory.livros.indexOf('Livro Sobre Espada II') != -1);
-    if (inventory.livros.indexOf('Livro Sobre Espada II') != -1) {
-        description.innerHTML += '<br>Você olha a loja e vê:<br>Um estoque de Poções.'
-        btns[4].textContent = '. . .';
-        btns[4].onclick = template;
-        console.log(inventory.livros);
-    } else {
-        description.innerHTML += '<br>Você olha a loja e vê:<br>Um estoque de Poções.'
-        description.innerHTML += '<br>Livro Sobre Espada II.';
-        console.log(inventory.livros);
-    }
+    description.innerHTML += '<br>Você olha a loja e vê:<br>Um estoque de Poções.'
+    //console.log(!inventory.livros.indexOf('Livro Sobre Espada II') != -1);
+    lookForStuff(0);
 }
 
 function moveToTabernA() {
@@ -264,7 +449,7 @@ function setTxt (currentLocation) {
 function changeButtons(currentLocation, currentPlace) {
     for (let i = 0; i < 6; i++) {
         btns[i].textContent = locationMap[currentLocation].places[currentPlace].buttons[i].btntxt;
-        console.log(btns[i].textContent = locationMap[currentLocation].places[currentPlace].buttons[i].btntxt);
+        //console.log(btns[i].textContent = locationMap[currentLocation].places[currentPlace].buttons[i].btntxt);
         btns[i].onclick = locationMap[currentLocation].places[currentPlace].buttons[i].btnfunc;
     }
 }
@@ -294,6 +479,7 @@ function lookForLevelUp() {
         hero.nextLevel += 50;
         description.innerHTML += '<br>Você ganhou 1 level.';
         hero.damage += 5;
+        hero.arrowDmg += 5;
         hero.maxHealth += 10;
         hero.maxStamina += 5;
         updtHeroStats();
@@ -350,6 +536,9 @@ function showBooks() {
 
 function seeInventory() {
     description.innerHTML += `<br>Você possui a Espada Sagrada (dano médio: ${hero.damage + 4}).`
+    if (hero.bow) {
+        description.innerHTML += `<br>Você possui Um Arco e Flechas (dano médio: ${hero.arrowDmg + 4}).`
+    }
     description.innerHTML += `<br>Você está usando uma Armadura de ${hero.armor}.`
     description.innerHTML += '<br>Você abre a mochila e vê:' + showInventory();
 }
@@ -380,37 +569,103 @@ function sellPotion() {
 
 const monsters = [
     {
-        name: 'Goblin',
+        name: 'Lobo Selvagem',
         atk: 4,
         vida: 40,
         xp: 20,
         gold: 10,
     },
     {
-        name: 'Goblin Chefe',
-        atk: 30,
+        name: 'Lobo Selvagem Gigante',
+        atk: 20,
         vida: 150,
         xp: 60,
         gold: 80,
+    },
+    {
+        name: 'Goblin',
+        atk: 15,
+        vida: 80,
+        xp: 30,
+        gold: 20,
+    },
+    {
+        name: 'Orc',
+        atk: 25,
+        vida: 110,
+        xp: 50,
+        gold: 30,
+    },
+    {
+        name: 'Troll',
+        atk: 50,
+        vida: 300,
+        xp: 150,
+        gold: 100,
     },
 ];
 
 let currentMonsterFight;
 let currentMonsterLife;
-let goblinsKilled;
+let wolfKilled = 0;
+let trollsKilled = 0;
+
+function addBowButton(bow) {
+    if (bow) {
+        btns[4].textContent = 'Atirar um flecha';
+        btns[4].onclick = shoot;
+    }
+}
+
+function shoot() {
+    let heroAtk = hero.arrowDmg + getRandNumb();
+    let random = Math.floor(Math.random() * chanceToShoot);
+    if (random == 0) {
+        description.innerHTML += `<br>Você causou ${heroAtk} de dano.`
+        currentMonsterLife -= heroAtk;
+    } else {
+        description.innerHTML += `<br>Você errou.`
+    }
+    if (currentMonsterLife > 0) {
+        monsterTurn();
+    } else {
+        battle();
+    }
+}
 
 function covilFight() {
-    goblinsKilled = 0;
+    wolfKilled = 9;
     resetTxt();
     updateLocation(0, 3);
 }
 
+function covilBoss() {
+    resetTxt();
+    updateLocation(0, 7);
+    description.innerHTML += '<br>Você chegou no fundo do Covil e sente' +
+    ' uma presença poderosa mais a frente.';
+}
+
 function fightingCovil() {
-    if (goblinsKilled > 9) {
+    if (wolfKilled > 9) {
         currentMonsterFight = 1;
-        fighting();
+        covilBoss();
     } else {
         currentMonsterFight = 0;
+        fighting();
+    }
+}
+
+function fightingMontain() {
+    let random = Math.floor(Math.random() * 8);
+    if (random == 0) {
+        currentMonsterFight = 4
+        fighting();
+    } else if (random > 0 && random < 3) {
+        currentMonsterFight = 2
+        fighting();
+    } else {
+        currentMonsterFight = 3
         fighting();
     }
 }
@@ -434,28 +689,45 @@ function battle() {
         getXp < 0 ? getXp = 0 : getXp;
         description.innerHTML += '<br>Você derrotou um ' + monsters[currentMonsterFight].name + '.';
         description.innerHTML += `<br>Você ganhou ${getXp} de xp e ${getGold} de ouro.`;
-        changeButtons(0, 5);
+        changeButtons(currentLocation, 5);
         setTimeout(() => {
             resetTxt();
-            updateLocation(0, 3);
+            updateLocation(currentLocation, 3);
         }, 1500);
+        monsterDead(currentLocation);
         //updateLocation(0, 3);
-        if (currentMonsterFight == 1) {
-            alert('Você terminou a parte 1');
-            resetTxt();
-            updateLocation(1, 0);
-            return;
-        }
-        goblinsKilled++;
-        //console.log(goblinsKilled);
+        //console.log(wolfKilled);
         hero.xp += getXp;
         hero.gold += getGold;
         lookForLevelUp();
+        if (currentMonsterFight == 1) {
+            wolfKilled = 0;
+            alert('Você derrotou o Lobo Selvagem Gigante e decide seguir sua aventura.');
+            resetTxt();
+            moveToVillageB();
+            //updateLocation(1, 0);
+            return;
+        }
     } else {
-        updateLocation(0, 4);
+        updateLocation(currentLocation, 4);
+        addBowButton(hero.bow);
         resetTxt();
         description.innerHTML += 'Você está enfrentando um ' + monsters[currentMonsterFight].name + '.';
         addMonster();
+    }
+}
+
+function monsterDead(location) {
+    if (location == 0) {
+        wolfKilled++;
+    } else {
+        if (currentMonsterFight == 4) {
+            trollsKilled++;
+            locationMap[1].objective = `Missão: Mate todos os Trolls ${trollsKilled}/4`;
+            if (trollsKilled == 4) {
+                alert('Voce terminou a parte 2');
+            }
+        }
     }
 }
 
@@ -488,9 +760,9 @@ function usePotion() {
 }
 
 function dodge() {
-    let random = Math.floor(Math.random() * 2);
-    //console.log(random);
-    if (random === 0) {
+    let random = Math.floor(Math.random() * hero.dodgeChance);
+    console.log(random);
+    if (random !== 0) {
         description.innerHTML += `<br>Você não consegue esquivar.`;
         monsterTurn();
     } else {
@@ -503,7 +775,7 @@ function flee() {
     let random = Math.floor(Math.random() * 2);
     if (random === 0) {
         resetTxt();
-        updateLocation(0, 3);
+        updateLocation(currentLocation, 3);
     } else {
         description.innerHTML += `<br>Você não consegue fugir.`;
         monsterTurn();
@@ -512,6 +784,7 @@ function flee() {
 
 function gameOver() {
     alert('Você morreu!');
+    window.location.href = '/./index.html';
 }
 
 function addMonster() {
@@ -527,7 +800,7 @@ function monsterSpecial() {
     let monsterDmg = monsters[currentMonsterFight].atk + getRandNumb() - hero.def;
     changeButtons(0, 5);
     setTimeout(() => {
-        description.innerHTML += `<br>${monsters[currentMonsterFight].name} lhe acerta na cabeça.`;
+        description.innerHTML += `<br>${monsters[currentMonsterFight].name} lhe ataca na cabeça.`;
         description.innerHTML += `<br>Você recebeu ${monsterDmg*2} de dano.`;
         setTimeout(() => {
             hero.health -= monsterDmg*2;
@@ -535,12 +808,10 @@ function monsterSpecial() {
                 battle();
                 updtHeroStats();
                 if (hero.health <= 0) {
-                    alert('derrota');
-                    window.location.href = '/./index.html'
+                    gameOver();
                 }
             }, 1500);
     }, 1000);
-    //battle();
 }
 
 function monsterAtk() {
@@ -555,10 +826,8 @@ function monsterAtk() {
                 battle();
                 updtHeroStats();
                 if (hero.health <= 0) {
-                    alert('derrota');
-                    window.location.href = '/./index.html'
+                    gameOver();
                 }
             }, 1500);
     }, 1000);
-    //battle();
 }
