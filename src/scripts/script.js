@@ -5,12 +5,15 @@ const nameLocation = document.getElementById('location');
 const currentDay = document.getElementById('days');
 const currentObjctive = document.getElementById('mission');
 const description = document.getElementById('description');
+const btns = document.getElementsByClassName('btn');
 
 const levelTxt = document.getElementById('lvl');
 const healthTxt = document.getElementById('health');
 const staminaTxt = document.getElementById('stamina');
 const goldTxt = document.getElementById('gold');
 const invBtn = document.getElementById('invBtn');
+
+function template() {};
 
 const hero = {
     level: 1,
@@ -31,8 +34,6 @@ const hero = {
     dodgeBuff: false,
     dodgeChance: 3,
 }
-
-function template() {};
 
 const locationMap = [
     {
@@ -140,7 +141,7 @@ const locationMap = [
                     { btntxt: 'Treinar', btnfunc: training },
                     { btntxt: 'Dormir', btnfunc: recover },
                     { btntxt: 'Ir a loja', btnfunc: moveToShopB },
-                    { btntxt: 'Ir ao ferreiro', btnfunc: moveToSmithA },
+                    { btntxt: 'Ir ao ferreiro', btnfunc: moveToSmithB },
                     { btntxt: 'Ir a taverna', btnfunc: moveToTabernB },
                 ],
             },
@@ -219,12 +220,12 @@ const locationMap = [
             {
                 name: 'Vila próxima a Tumba.',
                 buttons: [
-                    { btntxt: 'Ir a tumba', btnfunc: exploreMontain },
+                    { btntxt: 'Ir a tumba', btnfunc: template },
                     { btntxt: 'Treinar', btnfunc: training },
                     { btntxt: 'Dormir', btnfunc: recover },
-                    { btntxt: 'Ir a loja', btnfunc: moveToShopB },
-                    { btntxt: 'Ir ao ferreiro', btnfunc: moveToSmithA },
-                    { btntxt: 'Ir a taverna', btnfunc: moveToTabernB },
+                    { btntxt: 'Ir a loja', btnfunc: moveToShopC },
+                    { btntxt: 'Ir ao ferreiro', btnfunc: moveToSmithC },
+                    { btntxt: 'Ir a taverna', btnfunc: moveToTabernC },
                 ],
             },
             {
@@ -232,32 +233,32 @@ const locationMap = [
                 buttons: [
                     { btntxt: 'Comprar poção', btnfunc: buyPotion },
                     { btntxt: 'Vender poção', btnfunc: sellPotion },
-                    { btntxt: 'Comprar Livro Sobre Espada IV', btnfunc: buyBow },
-                    { btntxt: 'Comprar Livro Sobre Arco II', btnfunc: buyBookSword3 },
-                    { btntxt: 'Comprar Livro Sobre Esquiva I', btnfunc: buyBookBow1 },
-                    { btntxt: 'Voltar', btnfunc: moveToVillageB },
+                    { btntxt: 'Comprar Livro Sobre Espada IV', btnfunc: buyBookSword4 },
+                    { btntxt: 'Comprar Livro Sobre Arco II', btnfunc: buyBookBow2 },
+                    { btntxt: 'Comprar Livro Sobre Esquiva I', btnfunc: buyBookDodge },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageC },
                 ]
             },
             {
                 name: 'Taverna',
                 buttons: [
                     { btntxt: 'Pedir cerveja', btnfunc: buyBeer },
-                    { btntxt: 'Escutar conversas', btnfunc: listenTabernB },
+                    { btntxt: 'Escutar conversas', btnfunc: listenTabernC },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
-                    { btntxt: 'Voltar', btnfunc: moveToVillageB },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageC },
                 ]
             },
             {
-                name: 'Entrada do Castelo.',
+                name: 'Entrada da Tumba.',
                 buttons: [
                     { btntxt: 'Entrar', btnfunc: fightingMontain },
                     { btntxt: 'Usar poção', btnfunc: usePotion },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
-                    { btntxt: 'Voltar', btnfunc: moveToVillageB },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageC },
                 ],
             },
             {
@@ -285,306 +286,80 @@ const locationMap = [
             {
                 name: 'Ferreiro',
                 buttons: [
-                    { btntxt: 'Armadura de Ferro', btnfunc: buyArmor1 },
-                    { btntxt: 'Armadura de Platina', btnfunc: buyArmor2 },
-                    { btntxt: 'Armadura de Platina Completa', btnfunc: template },
+                    { btntxt: 'Armadura de Platina', btnfunc: buyArmor3 },
+                    { btntxt: 'Armadura de Platina Completa', btnfunc: buyArmor4 },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
-                    { btntxt: 'Voltar', btnfunc: moveToVillageB },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageC },
                 ]
             },
         ]
     },
 ];
 
-function buyBookSword2() {
-    if (hero.gold >= 150) {
-        buyBook('Livro Sobre Espada II', 4);
-        hero.gold -= 150;
-        hero.damage += 10;
-        updtHeroStats();
-    } else {
-        description.innerHTML += '<br>Você não tem ouro suficiente.';
-    }
+const inventory = {
+    poção: 2,
+    livros: [ 
+        'Livro Sobre Espada I',
+    ]
 }
 
-function buyBookSword3() {
-    if (hero.gold >= 150) {
-        buyBook('Livro Sobre Espada III', 3);
-        hero.gold -= 150;
-        hero.damage += 10;
-        updtHeroStats();
-    } else {
-        description.innerHTML += '<br>Você não tem ouro suficiente.';
-    }
-}
-
-function buyBookSword4() {
-    
-}
-
-function buyBookBow1() {
-    if (hero.gold >= 150) {
-        buyBook('Livro Sobre Arco I', 4);
-        hero.gold -= 150;
-        hero.arrowDmg += 10;
-        hero.chanceToShoot = 3;
-        updtHeroStats();
-    } else {
-        description.innerHTML += '<br>Você não tem ouro suficiente.';
-    }
-}
-
-function buyBookBow2() {
-    
-}
-
-function buyBookDodge() {
-    
-}
-
-function moveToSmithA() {
-    resetTxt();
-    updateLocation(1, 6);
-    lookForArmor();
-    if (hero.armor.includes('8')) {
-        description.innerHTML += '<br>Você não vê armaduras melhores.';
-    } else {
-        description.innerHTML += '<br>Você vê uma variedade de armaduras a venda.';
-    }
-}
-
-function lookForArmor() {
-    if (hero.armor.includes('6')) {
-        btns[0].textContent = '. . .';
-        btns[0].onclick = template;
-    } else if (hero.armor.includes('8')) {
-        btns[0].textContent = '. . .';
-        btns[0].onclick = template;
-        btns[1].textContent = '. . .';
-        btns[1].onclick = template;
-    }
-}
-
-function buyArmor1() {
-    if (hero.gold >= 200) {
-        description.innerHTML += '<br>Você comprou uma Armadura de Ferro.'
-        btns[0].textContent = '. . .';
-        btns[0].onclick = template;
-        hero.armor = 'Armadura de Ferro (def: 6)';
-        hero.def = 6;
-        hero.gold -= 200;
-        updtHeroStats();
-    } else {
-        description.innerHTML += '<br>Você não tem ouro suficiente.'
-    }
-}
-
-function buyArmor2() {
-    if (hero.gold >= 300) {
-        description.innerHTML += '<br>Você comprou uma Armadura de Ferro.'
-        btns[0].textContent = '. . .';
-        btns[0].onclick = template;
-        btns[1].textContent = '. . .';
-        btns[1].onclick = template;
-        hero.armor = 'Armadura de Ferro Completa (def: 8)';
-        hero.def = 8;
-        hero.gold -= 300;
-        updtHeroStats();
-    } else {
-        description.innerHTML += '<br>Você não tem ouro suficiente.'
-    }
-}
-
-function buyBook(name, button) {
-    inventory.livros.push(name);
-    //console.log(inventory.livros);
-    description.innerHTML += `<br>Você comprou o ${name}.<br>Seu dano aumentou.`
-    btns[button].textContent = '. . .';
-    btns[button].onclick = template;
-}
-
-function buyBow() {
-    if (hero.gold >= 100) {
-        description.innerHTML += '<br>Você comprou um arco com flechas.';
-        btns[2].textContent = '. . .';
-        btns[2].onclick = template;
-        hero.gold -= 100;
-        hero.bow = true;
-    } else {
-        description.innerHTML += '<br>Você não tem ouro suficiente.';
-    }
-}
-
-function buyBeer() {
-    if (hero.stamina > 0) {
-        if (hero.gold >= 30) {
-            description.innerHTML += '<br>Você comprou uma cerveja e se sente revigorado.'
-            hero.gold -= 30;
-            if (hero.stamina < 20) {
-                hero.stamina = 0;
-                updtHeroStats();
-            } else {
-                hero.stamina -= 20;
-                updtHeroStats();
-            }
-        } else {
-            description.innerHTML += '<br>Você não tem ouro suficiente.'
-        }
-    } else {
-        description.innerHTML += '<br>Você não precisa relaxar.'
-    }
-}
-
-function listenTabernA() {
-    resetTxt();
-    updateLocation(0, 6)
-    let random = Math.floor(Math.random() * 3);
-    if (random === 1) {
-        description.innerHTML += '<br>Você começa a escutar algumas conversas.' +
-        '<br>Homem A: ... que há um Lobo Selvagem Gigante no fundo do covil.' +
-        '<br>Homem B: Também ouvi falar nisso, mas parece que para chegar a ele, ' +  
-        'tem que derrotar pelo menos 10 lobos selvagens.' +
-        '<br>Homem A: Quem seria louco de ir tão fundo.'
-    } else {
-        description.innerHTML += '<br>Você começa a escutar algumas conversas.' +
-        '<br>Homem A: ... que um lobo selvagem matou duas ovelhas de meu vizinho.' +
-        '<br>Homem B: Até quando vamos sofrer com essas pragas.'
-    }
-}
-
-function moveToShopB() {
-    resetTxt();
-    updateLocation(1, 1);
-    description.innerHTML += '<br>Você olha a loja e vê:<br>Um estoque de Poções.';
-    lookForStuff(1);
-}
-
-function listenTabernB() {
-    resetTxt();
-    updateLocation(1, 2)
-    let random = Math.floor(Math.random() * 3);
-    if (random === 1) {
-        description.innerHTML += '<br>Homem A: ... que existem 4 Trolls nos Arredores da Montanha.' +
-        '<br>Homem B: Só o que podemos fazer é rezar para que eles vão embora.';
-    } else {
-        description.innerHTML += '<br>Homem A: O inverno será bem difícil.' +
-        '<br>Homem B: Claro, com Goblins e Orcs atacando nos arredores, como os suprimentos ' +
-        'chegaram aqui.' +
-        '<br>Homem A: Melhor começar a estocar agora.';
-    }
-}
-
-function moveToTabernB() {
-    resetTxt();
-    updateLocation(1, 2);
-}
-
-function exploreMontain() {
-    resetTxt();
-    updateLocation(1, 3);
-}
+const monsters = [
+    {
+        name: 'Lobo Selvagem',
+        atk: 5,
+        vida: 40,
+        xp: 18,
+        gold: 8,
+    },
+    {
+        name: 'Lobo Selvagem Gigante',
+        atk: 20,
+        vida: 150,
+        xp: 58,
+        gold: 78,
+    },
+    {
+        name: 'Goblin',
+        atk: 15,
+        vida: 80,
+        xp: 28,
+        gold: 18,
+    },
+    {
+        name: 'Orc',
+        atk: 25,
+        vida: 110,
+        xp: 48,
+        gold: 28,
+    },
+    {
+        name: 'Troll',
+        atk: 50,
+        vida: 300,
+        xp: 148,
+        gold: 98,
+    },
+];
 
 let currentLocation;
+let currentMonsterFight;
+let currentMonsterLife;
+let wolfKilled = 0;
+let trollsKilled = 0;
+invBtn.onclick = seeInventory;
 
-const btns = document.getElementsByClassName('btn');
-
-// advance.addEventlistenTabernAer('click', () => {
-//     prologue.style.display = 'none';
-//     //alert('funciona');
-//     startGame();
-//     updtHeroStats();
-// });
-
-startGame();
-updtHeroStats();
-
-function startGame() {
-    moveToVillageC();
-    updtHeroStats();
-}
-
-function moveToVillageC() {
-    resetTxt();
-    updateLocation(2, 0);
-    currentLocation = 2;
-}
-
-function moveToVillageB() {
-    resetTxt();
-    updateLocation(1, 0);
-    currentLocation = 1;
-}
-
-function getRandNumb() {
-    let random = Math.floor(Math.random() * 10); 
-    return random;
+// GLOBAL
+function updtHeroStats() {
+    levelTxt.innerText = hero.level;
+    healthTxt.innerText = `${hero.health}/${hero.maxHealth}`;
+    staminaTxt.innerText = `${hero.stamina}/${hero.maxStamina}`;
+    goldTxt.innerText = `${hero.gold}g`;
 }
 
 function resetTxt() {
     description.innerHTML = "";
-}
-
-function moveToVillageA() {
-    resetTxt();
-    updateLocation(0, 0);
-    currentLocation = 0;
-}
-
-function moveToCovil() {
-    resetTxt();
-    updateLocation(0, 1);
-}
-
-function lookForStuff(shop) {
-    if (shop == 0) {
-        if (inventory.livros.indexOf('Livro Sobre Espada II') != -1) {
-            btns[4].textContent = '. . .';
-            btns[4].onclick = template;
-            //console.log(inventory.livros);
-        } else {
-            description.innerHTML += '<br>Livro Sobre Espada II.';
-            //console.log(inventory.livros);
-        }
-    } else if(shop == 1) {
-        if (hero.bow) {
-            btns[2].textContent = '. . .';
-            btns[2].onclick = template;
-            //console.log(inventory.livros);
-        } else {
-            description.innerHTML += '<br>Arco com flechas.';
-            //console.log(inventory.livros);
-        }
-        if (inventory.livros.indexOf('Livro Sobre Espada III') != -1) {
-            btns[3].textContent = '. . .';
-            btns[3].onclick = template;
-            //console.log(inventory.livros);
-        } else {
-            description.innerHTML += '<br>Livro Sobre Espada III.';
-            //console.log(inventory.livros);
-        }
-        if (inventory.livros.indexOf('Livro Sobre Arco I') != -1) {
-            btns[4].textContent = '. . .';
-            btns[4].onclick = template;
-            //console.log(inventory.livros);
-        } else {
-            description.innerHTML += '<br>Livro Sobre Arco I.';
-            //console.log(inventory.livros);
-        }
-    }
-}
-
-function moveToShopA() {
-    resetTxt();
-    updateLocation(0, 2);
-    description.innerHTML += '<br>Você olha a loja e vê:<br>Um estoque de Poções.'
-    //console.log(!inventory.livros.indexOf('Livro Sobre Espada II') != -1);
-    lookForStuff(0);
-}
-
-function moveToTabernA() {
-    resetTxt();
-    updateLocation(0, 6);
 }
 
 function updateLocation(location, place) {
@@ -607,13 +382,6 @@ function changeButtons(currentLocation, currentPlace) {
         //console.log(btns[i].textContent = locationMap[currentLocation].places[currentPlace].buttons[i].btntxt);
         btns[i].onclick = locationMap[currentLocation].places[currentPlace].buttons[i].btnfunc;
     }
-}
-
-function updtHeroStats() {
-    levelTxt.innerText = hero.level;
-    healthTxt.innerText = `${hero.health}/${hero.maxHealth}`;
-    staminaTxt.innerText = `${hero.stamina}/${hero.maxStamina}`;
-    goldTxt.innerText = `${hero.gold}g`;
 }
 
 function training() {
@@ -660,46 +428,148 @@ function recover() {
     }
 }
 
-const inventory = {
-    poção: 2,
-    armaduras: [
-        {
-            name: 'couro',
-            def: 2,
-        }
-    ],
-    livros: [ 
-        'Livro Sobre Espada I',
-    ]
+function getRandNumb() {
+    let random = Math.floor(Math.random() * 10); 
+    return random;
 }
 
-function showInventory() {
-    if (inventory.poção === 1) {
-        return `<br>${inventory.poção} Poção.${showBooks()}`
+function gameOver() {
+    alert('Você morreu!');
+    window.location.href = '/./index.html';
+}
+
+
+// VILLAGE A
+function moveToVillageA() {
+    resetTxt();
+    updateLocation(0, 0);
+    currentLocation = 0;
+}
+
+function moveToCovil() {
+    resetTxt();
+    updateLocation(0, 1);
+}
+
+function moveToShopA() {
+    resetTxt();
+    updateLocation(0, 2);
+    description.innerHTML += '<br>Você olha a loja e vê:<br>Um estoque de Poções.'
+    //console.log(!inventory.livros.indexOf('Livro Sobre Espada II') != -1);
+    lookForStuff(0);
+}
+
+function moveToTabernA() {
+    resetTxt();
+    updateLocation(0, 6);
+}
+
+function covilFight() {
+    wolfKilled = 0;
+    resetTxt();
+    updateLocation(0, 3);
+}
+
+function covilBoss() {
+    resetTxt();
+    updateLocation(0, 7);
+    description.innerHTML += '<br>Você chegou no fundo do Covil e sente' +
+    ' uma presença poderosa mais a frente.';
+}
+
+function fightingCovil() {
+    if (wolfKilled > 9) {
+        currentMonsterFight = 1;
+        covilBoss();
     } else {
-        return `<br>${inventory.poção} Poções.${showBooks()}`;
+        currentMonsterFight = 0;
+        fighting();
     }
 }
 
-function showBooks() {
-    let booksList = '';
-    for (let i = 0; i < inventory.livros.length; i++) {
-        booksList += `<br>${inventory.livros[i]}.`;
-    }
-    return booksList;
+
+// VILLAGE B
+function moveToVillageB() {
+    resetTxt();
+    updateLocation(1, 0);
+    currentLocation = 1;
 }
 
-function seeInventory() {
-    description.innerHTML += `<br>Você possui a Espada Sagrada (dano médio: ${hero.damage + 4}).`
-    if (hero.bow) {
-        description.innerHTML += `<br>Você possui Um Arco e Flechas (dano médio: ${hero.arrowDmg + 4}).`
-    }
-    description.innerHTML += `<br>Você está usando uma ${hero.armor}.`
-    description.innerHTML += '<br>Você abre a mochila e vê:' + showInventory();
+function exploreMontain() {
+    resetTxt();
+    updateLocation(1, 3);
 }
 
-invBtn.onclick = seeInventory;
+function moveToShopB() {
+    resetTxt();
+    updateLocation(1, 1);
+    description.innerHTML += '<br>Você olha a loja e vê:<br>Um estoque de Poções.';
+    lookForStuff(1);
+}
 
+function moveToSmithB() {
+    resetTxt();
+    updateLocation(1, 6);
+    lookForArmor();
+    if (hero.armor.includes('8')) {
+        description.innerHTML += '<br>Você não vê armaduras melhores.';
+    } else {
+        description.innerHTML += '<br>Você vê uma variedade de armaduras a venda.';
+    }
+}
+
+function moveToTabernB() {
+    resetTxt();
+    updateLocation(1, 2);
+}
+
+function fightingMontain() {
+    let random = Math.floor(Math.random() * 8);
+    if (random == 0) {
+        currentMonsterFight = 4
+        fighting();
+    } else if (random > 0 && random < 3) {
+        currentMonsterFight = 2
+        fighting();
+    } else {
+        currentMonsterFight = 3
+        fighting();
+    }
+}
+
+
+// VILLAGE C
+function moveToVillageC() {
+    resetTxt();
+    updateLocation(2, 0);
+    currentLocation = 2;
+}
+
+function moveToShopC() {
+    resetTxt();
+    updateLocation(2, 1);
+    description.innerHTML += '<br>Você olha a loja e vê:<br>Um estoque de Poções.';
+    lookForStuff(2);
+}
+
+function moveToSmithC() {
+    resetTxt();
+    updateLocation(2, 6);
+    lookForArmor();
+    if (hero.armor.includes('14')) {
+        description.innerHTML += '<br>Você não vê armaduras melhores.';
+    } else {
+        description.innerHTML += '<br>Você vê uma variedade de armaduras a venda.';
+    }
+}
+
+function moveToTabernC() {
+    resetTxt();
+    updateLocation(2, 2);
+}
+
+
+// SHOP
 function buyPotion() {
     if (hero.gold < 50) {
         description.innerHTML += '<br>Você não tem ouro suficiente.'
@@ -722,109 +592,160 @@ function sellPotion() {
     }
 }
 
-const monsters = [
-    {
-        name: 'Lobo Selvagem',
-        atk: 4,
-        vida: 40,
-        xp: 18,
-        gold: 8,
-    },
-    {
-        name: 'Lobo Selvagem Gigante',
-        atk: 20,
-        vida: 150,
-        xp: 58,
-        gold: 78,
-    },
-    {
-        name: 'Goblin',
-        atk: 15,
-        vida: 80,
-        xp: 28,
-        gold: 18,
-    },
-    {
-        name: 'Orc',
-        atk: 25,
-        vida: 110,
-        xp: 48,
-        gold: 28,
-    },
-    {
-        name: 'Troll',
-        atk: 50,
-        vida: 300,
-        xp: 148,
-        gold: 98,
-    },
-];
-
-let currentMonsterFight;
-let currentMonsterLife;
-let wolfKilled = 0;
-let trollsKilled = 0;
-
-function addBowButton(bow) {
-    if (bow) {
-        btns[4].textContent = 'Atirar um flecha';
-        btns[4].onclick = shoot;
-    }
-}
-
-function shoot() {
-    let heroAtk = hero.arrowDmg + getRandNumb();
-    let random = Math.floor(Math.random() * hero.chanceToShoot);
-    if (random == 0) {
-        description.innerHTML += `<br>Você causou ${heroAtk} de dano.`
-        currentMonsterLife -= heroAtk;
+function lookForStuff(shop) {
+    if (shop == 0) {
+        if (inventory.livros.indexOf('Livro Sobre Espada II') != -1) {
+            btns[4].textContent = '. . .';
+            btns[4].onclick = template;
+            //console.log(inventory.livros);
+        } else {
+            description.innerHTML += '<br>Livro Sobre Espada II.';
+            //console.log(inventory.livros);
+        }
+    } else if(shop == 1) {
+        if (hero.bow) {
+            btns[2].textContent = '. . .';
+            btns[2].onclick = template;
+            //console.log(inventory.livros);
+        } else {
+            description.innerHTML += '<br>Arco com flechas.';
+            //console.log(inventory.livros);
+        }
+        if (inventory.livros.indexOf('Livro Sobre Espada III') != -1) {
+            btns[3].textContent = '. . .';
+            btns[3].onclick = template;
+            //console.log(inventory.livros);
+        } else {
+            description.innerHTML += '<br>Livro Sobre Espada III.';
+            //console.log(inventory.livros);
+        }
+        if (inventory.livros.indexOf('Livro Sobre Arco I') != -1) {
+            btns[4].textContent = '. . .';
+            btns[4].onclick = template;
+            //console.log(inventory.livros);
+        } else {
+            description.innerHTML += '<br>Livro Sobre Arco I.';
+            //console.log(inventory.livros);
+        }
     } else {
-        description.innerHTML += `<br>Você errou.`
+        if (inventory.livros.indexOf('Livro Sobre Espada IV') != -1) {
+            btns[2].textContent = '. . .';
+            btns[2].onclick = template;
+            //console.log(inventory.livros);
+        } else {
+            description.innerHTML += '<br>Livro Sobre Espada IV.';
+            //console.log(inventory.livros);
+        }
+        if (inventory.livros.indexOf('Livro Sobre Arco II') != -1) {
+            btns[3].textContent = '. . .';
+            btns[3].onclick = template;
+            //console.log(inventory.livros);
+        } else {
+            description.innerHTML += '<br>Livro Sobre Arco II.';
+            //console.log(inventory.livros);
+        }
+        if (inventory.livros.indexOf('Livro Sobre Esquiva I') != -1) {
+            btns[4].textContent = '. . .';
+            btns[4].onclick = template;
+            //console.log(inventory.livros);
+        } else {
+            description.innerHTML += '<br>Livro Sobre Esquiva I.';
+            //console.log(inventory.livros);
+        }
     }
-    if (currentMonsterLife > 0) {
-        monsterTurn();
+}
+
+function buyBow() {
+    if (hero.gold >= 100) {
+        description.innerHTML += '<br>Você comprou um arco com flechas.';
+        btns[2].textContent = '. . .';
+        btns[2].onclick = template;
+        hero.gold -= 100;
+        hero.bow = true;
     } else {
-        battle();
+        description.innerHTML += '<br>Você não tem ouro suficiente.';
     }
 }
 
-function covilFight() {
-    wolfKilled = 9;
-    resetTxt();
-    updateLocation(0, 3);
+function buyBook(name, button) {
+    inventory.livros.push(name);
+    //console.log(inventory.livros);
+    description.innerHTML += `<br>Você comprou o ${name}.<br>Seu dano aumentou.`
+    btns[button].textContent = '. . .';
+    btns[button].onclick = template;
 }
 
-function covilBoss() {
-    resetTxt();
-    updateLocation(0, 7);
-    description.innerHTML += '<br>Você chegou no fundo do Covil e sente' +
-    ' uma presença poderosa mais a frente.';
-}
-
-function fightingCovil() {
-    if (wolfKilled > 9) {
-        currentMonsterFight = 1;
-        covilBoss();
+function buyBookSword2() {
+    if (hero.gold >= 150) {
+        buyBook('Livro Sobre Espada II', 4);
+        hero.gold -= 150;
+        hero.damage += 10;
+        updtHeroStats();
     } else {
-        currentMonsterFight = 0;
-        fighting();
+        description.innerHTML += '<br>Você não tem ouro suficiente.';
     }
 }
 
-function fightingMontain() {
-    let random = Math.floor(Math.random() * 8);
-    if (random == 0) {
-        currentMonsterFight = 4
-        fighting();
-    } else if (random > 0 && random < 3) {
-        currentMonsterFight = 2
-        fighting();
+function buyBookSword3() {
+    if (hero.gold >= 150) {
+        buyBook('Livro Sobre Espada III', 3);
+        hero.gold -= 150;
+        hero.damage += 10;
+        updtHeroStats();
     } else {
-        currentMonsterFight = 3
-        fighting();
+        description.innerHTML += '<br>Você não tem ouro suficiente.';
     }
 }
 
+function buyBookSword4() {
+    if (hero.gold >= 150) {
+        buyBook('Livro Sobre Espada IV', 2);
+        hero.gold -= 150;
+        hero.damage += 10;
+        updtHeroStats();
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.';
+    }
+}
+
+function buyBookBow1() {
+    if (hero.gold >= 150) {
+        buyBook('Livro Sobre Arco I', 4);
+        hero.gold -= 150;
+        hero.arrowDmg += 10;
+        hero.chanceToShoot = 3;
+        updtHeroStats();
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.';
+    }
+}
+
+function buyBookBow2() {
+    if (hero.gold >= 150) {
+        buyBook('Livro Sobre Arco II', 3);
+        hero.gold -= 150;
+        hero.arrowDmg += 10;
+        hero.chanceToShoot = 2;
+        updtHeroStats();
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.';
+    }
+}
+
+function buyBookDodge() {
+    if (hero.gold >= 150) {
+        buyBook('Livro Sobre Esquiva I', 4);
+        hero.gold -= 150;
+        hero.arrowDmg += 10;
+        hero.chanceToShoot = 3;
+        updtHeroStats();
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.';
+    }
+}
+
+
+// COMBAT
 function fighting() {
     currentMonsterLife = monsters[currentMonsterFight].vida;
     if (hero.stamina <= hero.maxStamina - 20) {
@@ -872,20 +793,6 @@ function battle() {
     }
 }
 
-function monsterDead(location) {
-    if (location == 0) {
-        wolfKilled++;
-    } else {
-        if (currentMonsterFight == 4) {
-            trollsKilled++;
-            locationMap[1].objective = `Missão: Mate todos os Trolls ${trollsKilled}/4`;
-            if (trollsKilled == 4) {
-                alert('Voce terminou a parte 2');
-            }
-        }
-    }
-}
-
 function attack() {
     let heroAtk = hero.damage + getRandNumb();
     if (hero.dodgeBuff) {
@@ -926,6 +833,29 @@ function dodge() {
     }
 }
 
+function addBowButton(bow) {
+    if (bow) {
+        btns[4].textContent = 'Atirar um flecha';
+        btns[4].onclick = shoot;
+    }
+}
+
+function shoot() {
+    let heroAtk = hero.arrowDmg + getRandNumb();
+    let random = Math.floor(Math.random() * hero.chanceToShoot);
+    if (random == 0) {
+        description.innerHTML += `<br>Você causou ${heroAtk} de dano.`
+        currentMonsterLife -= heroAtk;
+    } else {
+        description.innerHTML += `<br>Você errou.`
+    }
+    if (currentMonsterLife > 0) {
+        monsterTurn();
+    } else {
+        battle();
+    }
+}
+
 function flee() {
     let random = Math.floor(Math.random() * 2);
     if (random === 0) {
@@ -935,11 +865,6 @@ function flee() {
         description.innerHTML += `<br>Você não consegue fugir.`;
         monsterTurn();
     }
-}
-
-function gameOver() {
-    alert('Você morreu!');
-    window.location.href = '/./index.html';
 }
 
 function addMonster() {
@@ -952,7 +877,7 @@ function monsterTurn() {
 }
 
 function monsterSpecial() {
-    let monsterDmg = monsters[currentMonsterFight].atk + getRandNumb() - hero.def;
+    let monsterDmg = monsters[currentMonsterFight].atk + getRandNumb() - hero.def - hero.level;
     changeButtons(0, 5);
     setTimeout(() => {
         description.innerHTML += `<br>${monsters[currentMonsterFight].name} lhe ataca na cabeça.`;
@@ -970,7 +895,7 @@ function monsterSpecial() {
 }
 
 function monsterAtk() {
-    let monsterDmg = monsters[currentMonsterFight].atk + getRandNumb() - hero.def;
+    let monsterDmg = monsters[currentMonsterFight].atk + getRandNumb() - hero.def - hero.level;
     changeButtons(0, 5);
     setTimeout(() => {
         description.innerHTML += `<br>${monsters[currentMonsterFight].name} lhe ataca.`;
@@ -986,3 +911,201 @@ function monsterAtk() {
             }, 1500);
     }, 1000);
 }
+
+function monsterDead(location) {
+    if (location == 0) {
+        wolfKilled++;
+    } else {
+        if (currentMonsterFight == 4) {
+            trollsKilled++;
+            locationMap[1].objective = `Missão: Mate todos os Trolls ${trollsKilled}/4`;
+            if (trollsKilled == 4) {
+                alert('Voce terminou a parte 2');
+            }
+        }
+    }
+}
+
+
+// SMITH
+function lookForArmor() {
+    if (hero.armor.includes('6') || hero.armor.includes('12')) {
+        btns[0].textContent = '. . .';
+        btns[0].onclick = template;
+    } else if (hero.armor.includes('8') || hero.armor.includes('14')) {
+        btns[0].textContent = '. . .';
+        btns[0].onclick = template;
+        btns[1].textContent = '. . .';
+        btns[1].onclick = template;
+    }
+}
+
+function buyArmor1() {
+    if (hero.gold >= 200) {
+        description.innerHTML += '<br>Você comprou uma Armadura de Ferro.'
+        btns[0].textContent = '. . .';
+        btns[0].onclick = template;
+        hero.armor = 'Armadura de Ferro (def: 6)';
+        hero.def = 6;
+        hero.gold -= 200;
+        updtHeroStats();
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.'
+    }
+}
+
+function buyArmor2() {
+    if (hero.gold >= 300) {
+        description.innerHTML += '<br>Você comprou uma Armadura de Ferro Completa.'
+        btns[0].textContent = '. . .';
+        btns[0].onclick = template;
+        btns[1].textContent = '. . .';
+        btns[1].onclick = template;
+        hero.armor = 'Armadura de Ferro Completa (def: 8)';
+        hero.def = 8;
+        hero.gold -= 300;
+        updtHeroStats();
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.'
+    }
+}
+
+function buyArmor3() {
+    if (hero.gold >= 500) {
+        description.innerHTML += '<br>Você comprou uma Armadura de Platina.'
+        btns[0].textContent = '. . .';
+        btns[0].onclick = template;
+        hero.armor = 'Armadura de Platina (def: 12)';
+        hero.def = 12;
+        hero.gold -= 500;
+        updtHeroStats();
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.'
+    }
+}
+
+function buyArmor4() {
+    if (hero.gold >= 600) {
+        description.innerHTML += '<br>Você comprou uma Armadura de Platina Completa.'
+        btns[0].textContent = '. . .';
+        btns[0].onclick = template;
+        btns[1].textContent = '. . .';
+        btns[1].onclick = template;
+        hero.armor = 'Armadura de Platina Completa (def: 14)';
+        hero.def = 14;
+        hero.gold -= 600;
+        updtHeroStats();
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.'
+    }
+}
+
+
+// TAVERN
+function buyBeer() {
+    if (hero.stamina > 0) {
+        if (hero.gold >= 30) {
+            description.innerHTML += '<br>Você comprou uma cerveja e se sente revigorado.'
+            hero.gold -= 30;
+            if (hero.stamina < 20) {
+                hero.stamina = 0;
+                updtHeroStats();
+            } else {
+                hero.stamina -= 20;
+                updtHeroStats();
+            }
+        } else {
+            description.innerHTML += '<br>Você não tem ouro suficiente.'
+        }
+    } else {
+        description.innerHTML += '<br>Você não precisa relaxar.'
+    }
+}
+
+function listenTabernA() {
+    resetTxt();
+    updateLocation(0, 6)
+    let random = Math.floor(Math.random() * 3);
+    if (random === 1) {
+        description.innerHTML += '<br>Você começa a escutar algumas conversas.' +
+        '<br>Homem A: ... que há um Lobo Selvagem Gigante no fundo do covil.' +
+        '<br>Homem B: Também ouvi falar nisso, mas parece que para chegar a ele, ' +  
+        'tem que derrotar pelo menos 10 lobos selvagens.' +
+        '<br>Homem A: Quem seria louco de ir tão fundo.'
+    } else {
+        description.innerHTML += '<br>Você começa a escutar algumas conversas.' +
+        '<br>Homem A: ... que um lobo selvagem matou duas ovelhas de meu vizinho.' +
+        '<br>Homem B: Até quando vamos sofrer com essas pragas.'
+    }
+}
+
+function listenTabernB() {
+    resetTxt();
+    updateLocation(1, 2)
+    let random = Math.floor(Math.random() * 3);
+    if (random === 1) {
+        description.innerHTML += '<br>Homem A: ... que existem 4 Trolls nos Arredores da Montanha.' +
+        '<br>Homem B: Só o que podemos fazer é rezar para que eles vão embora.';
+    } else {
+        description.innerHTML += '<br>Homem A: O inverno será bem difícil.' +
+        '<br>Homem B: Claro, com Goblins e Orcs atacando nos arredores, como os suprimentos ' +
+        'chegaram aqui.' +
+        '<br>Homem A: Melhor começar a estocar agora.';
+    }
+}
+
+function listenTabernC() {
+    resetTxt();
+    updateLocation(2, 2)
+    let random = Math.floor(Math.random() * 3);
+    if (random === 1) {
+        description.innerHTML += '<br>Homem A:...';
+    } else {
+        description.innerHTML += '<br>Homem B:...';
+    }
+}
+
+
+// INVENTORY
+function showInventory() {
+    if (inventory.poção === 1) {
+        return `<br>${inventory.poção} Poção.${showBooks()}`
+    } else {
+        return `<br>${inventory.poção} Poções.${showBooks()}`;
+    }
+}
+
+function showBooks() {
+    let booksList = '';
+    for (let i = 0; i < inventory.livros.length; i++) {
+        booksList += `<br>${inventory.livros[i]}.`;
+    }
+    return booksList;
+}
+
+function seeInventory() {
+    description.innerHTML += `<br>Você possui a Espada Sagrada (dano médio: ${hero.damage + 4}).`
+    if (hero.bow) {
+        description.innerHTML += `<br>Você possui Um Arco e Flechas (dano médio: ${hero.arrowDmg + 4}).`
+    }
+    description.innerHTML += `<br>Você está usando uma ${hero.armor}.`
+    description.innerHTML += '<br>Você abre a mochila e vê:' + showInventory();
+}
+
+
+// PLAY
+
+// advance.addEventlistenTabernAer('click', () => {
+//     prologue.style.display = 'none';
+//     //alert('funciona');
+//     startGame();
+//     updtHeroStats();
+// });
+
+function startGame() {
+    moveToVillageC();
+    updtHeroStats();
+}
+
+startGame();
+updtHeroStats();
