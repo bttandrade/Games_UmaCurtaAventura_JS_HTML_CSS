@@ -21,7 +21,7 @@ const hero = {
     xp: 0,
     gold: 1000,
     daysPlaying: 1,
-    armor: 'Couro (def: 2)',
+    armor: 'Roupa de Couro (def: 2)',
     def: 2,
     nextLevel: 100,
     damage: 400,
@@ -31,8 +31,6 @@ const hero = {
     dodgeBuff: false,
     dodgeChance: 3,
 }
-
-let trainingXp = 20;
 
 function template() {};
 
@@ -142,7 +140,7 @@ const locationMap = [
                     { btntxt: 'Treinar', btnfunc: training },
                     { btntxt: 'Dormir', btnfunc: recover },
                     { btntxt: 'Ir a loja', btnfunc: moveToShopB },
-                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Ir ao ferreiro', btnfunc: moveToSmithA },
                     { btntxt: 'Ir a taverna', btnfunc: moveToTabernB },
                 ],
             },
@@ -201,6 +199,100 @@ const locationMap = [
                     { btntxt: '. . .', btnfunc: template },
                 ]
             },
+            {
+                name: 'Ferreiro',
+                buttons: [
+                    { btntxt: 'Armadura de Ferro', btnfunc: buyArmor1 },
+                    { btntxt: 'Armadura de Ferro Completa', btnfunc: buyArmor2 },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageB },
+                ]
+            },
+        ]
+    },
+    {
+        location: "Tumba",
+        objective: 'Missão: Mate o Lorde Vampiro',
+        places: [
+            {
+                name: 'Vila próxima a Tumba.',
+                buttons: [
+                    { btntxt: 'Ir a tumba', btnfunc: exploreMontain },
+                    { btntxt: 'Treinar', btnfunc: training },
+                    { btntxt: 'Dormir', btnfunc: recover },
+                    { btntxt: 'Ir a loja', btnfunc: moveToShopB },
+                    { btntxt: 'Ir ao ferreiro', btnfunc: moveToSmithA },
+                    { btntxt: 'Ir a taverna', btnfunc: moveToTabernB },
+                ],
+            },
+            {
+                name: 'Loja de Suprimentos.',
+                buttons: [
+                    { btntxt: 'Comprar poção', btnfunc: buyPotion },
+                    { btntxt: 'Vender poção', btnfunc: sellPotion },
+                    { btntxt: 'Comprar Livro Sobre Espada IV', btnfunc: buyBow },
+                    { btntxt: 'Comprar Livro Sobre Arco II', btnfunc: buyBookSword3 },
+                    { btntxt: 'Comprar Livro Sobre Esquiva I', btnfunc: buyBookBow1 },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageB },
+                ]
+            },
+            {
+                name: 'Taverna',
+                buttons: [
+                    { btntxt: 'Pedir cerveja', btnfunc: buyBeer },
+                    { btntxt: 'Escutar conversas', btnfunc: listenTabernB },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageB },
+                ]
+            },
+            {
+                name: 'Entrada do Castelo.',
+                buttons: [
+                    { btntxt: 'Entrar', btnfunc: fightingMontain },
+                    { btntxt: 'Usar poção', btnfunc: usePotion },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageB },
+                ],
+            },
+            {
+                name: 'Em combate.',
+                buttons: [
+                    { btntxt: 'Atacar', btnfunc: attack },
+                    { btntxt: 'Esquivar', btnfunc: dodge },
+                    { btntxt: 'Usar poção', btnfunc: usePotion },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Fugir', btnfunc: flee },
+                ]
+            },
+            {
+                name: '',
+                buttons: [
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                ]
+            },
+            {
+                name: 'Ferreiro',
+                buttons: [
+                    { btntxt: 'Armadura de Ferro', btnfunc: buyArmor1 },
+                    { btntxt: 'Armadura de Platina', btnfunc: buyArmor2 },
+                    { btntxt: 'Armadura de Platina Completa', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageB },
+                ]
+            },
         ]
     },
 ];
@@ -249,6 +341,59 @@ function buyBookBow2() {
 
 function buyBookDodge() {
     
+}
+
+function moveToSmithA() {
+    resetTxt();
+    updateLocation(1, 6);
+    lookForArmor();
+    if (hero.armor.includes('8')) {
+        description.innerHTML += '<br>Você não vê armaduras melhores.';
+    } else {
+        description.innerHTML += '<br>Você vê uma variedade de armaduras a venda.';
+    }
+}
+
+function lookForArmor() {
+    if (hero.armor.includes('6')) {
+        btns[0].textContent = '. . .';
+        btns[0].onclick = template;
+    } else if (hero.armor.includes('8')) {
+        btns[0].textContent = '. . .';
+        btns[0].onclick = template;
+        btns[1].textContent = '. . .';
+        btns[1].onclick = template;
+    }
+}
+
+function buyArmor1() {
+    if (hero.gold >= 200) {
+        description.innerHTML += '<br>Você comprou uma Armadura de Ferro.'
+        btns[0].textContent = '. . .';
+        btns[0].onclick = template;
+        hero.armor = 'Armadura de Ferro (def: 6)';
+        hero.def = 6;
+        hero.gold -= 200;
+        updtHeroStats();
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.'
+    }
+}
+
+function buyArmor2() {
+    if (hero.gold >= 300) {
+        description.innerHTML += '<br>Você comprou uma Armadura de Ferro.'
+        btns[0].textContent = '. . .';
+        btns[0].onclick = template;
+        btns[1].textContent = '. . .';
+        btns[1].onclick = template;
+        hero.armor = 'Armadura de Ferro Completa (def: 8)';
+        hero.def = 8;
+        hero.gold -= 300;
+        updtHeroStats();
+    } else {
+        description.innerHTML += '<br>Você não tem ouro suficiente.'
+    }
 }
 
 function buyBook(name, button) {
@@ -320,9 +465,13 @@ function listenTabernB() {
     updateLocation(1, 2)
     let random = Math.floor(Math.random() * 3);
     if (random === 1) {
-        description.innerHTML += '<br>Texto';
+        description.innerHTML += '<br>Homem A: ... que existem 4 Trolls nos Arredores da Montanha.' +
+        '<br>Homem B: Só o que podemos fazer é rezar para que eles vão embora.';
     } else {
-        description.innerHTML += '<br>Texto';
+        description.innerHTML += '<br>Homem A: O inverno será bem difícil.' +
+        '<br>Homem B: Claro, com Goblins e Orcs atacando nos arredores, como os suprimentos ' +
+        'chegaram aqui.' +
+        '<br>Homem A: Melhor começar a estocar agora.';
     }
 }
 
@@ -351,8 +500,14 @@ startGame();
 updtHeroStats();
 
 function startGame() {
-    moveToVillageB();
+    moveToVillageC();
     updtHeroStats();
+}
+
+function moveToVillageC() {
+    resetTxt();
+    updateLocation(2, 0);
+    currentLocation = 2;
 }
 
 function moveToVillageB() {
@@ -467,7 +622,7 @@ function training() {
     } else {
         hero.stamina += 30;
         hero.xp += 20;
-        description.innerHTML += `<br>Você ganhou ${trainingXp}xp.`;
+        description.innerHTML += `<br>Você ganhou 20 de xp.`;
         lookForLevelUp()
     }
 }
@@ -539,7 +694,7 @@ function seeInventory() {
     if (hero.bow) {
         description.innerHTML += `<br>Você possui Um Arco e Flechas (dano médio: ${hero.arrowDmg + 4}).`
     }
-    description.innerHTML += `<br>Você está usando uma Armadura de ${hero.armor}.`
+    description.innerHTML += `<br>Você está usando uma ${hero.armor}.`
     description.innerHTML += '<br>Você abre a mochila e vê:' + showInventory();
 }
 
@@ -572,36 +727,36 @@ const monsters = [
         name: 'Lobo Selvagem',
         atk: 4,
         vida: 40,
-        xp: 20,
-        gold: 10,
+        xp: 18,
+        gold: 8,
     },
     {
         name: 'Lobo Selvagem Gigante',
         atk: 20,
         vida: 150,
-        xp: 60,
-        gold: 80,
+        xp: 58,
+        gold: 78,
     },
     {
         name: 'Goblin',
         atk: 15,
         vida: 80,
-        xp: 30,
-        gold: 20,
+        xp: 28,
+        gold: 18,
     },
     {
         name: 'Orc',
         atk: 25,
         vida: 110,
-        xp: 50,
-        gold: 30,
+        xp: 48,
+        gold: 28,
     },
     {
         name: 'Troll',
         atk: 50,
         vida: 300,
-        xp: 150,
-        gold: 100,
+        xp: 148,
+        gold: 98,
     },
 ];
 
@@ -619,7 +774,7 @@ function addBowButton(bow) {
 
 function shoot() {
     let heroAtk = hero.arrowDmg + getRandNumb();
-    let random = Math.floor(Math.random() * chanceToShoot);
+    let random = Math.floor(Math.random() * hero.chanceToShoot);
     if (random == 0) {
         description.innerHTML += `<br>Você causou ${heroAtk} de dano.`
         currentMonsterLife -= heroAtk;
