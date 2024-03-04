@@ -15,10 +15,8 @@
 }
 
 #prologue-box {
-    border: 4px double black;
-    justify-content: flex-start;
     height: 500px;
-    width: 500px;
+    width: 570px;
 }
 
 #text {
@@ -26,8 +24,9 @@
     background-color: white;
     margin: 40px;
     padding: 20px;
-    font-size: 1.8em;
+    font-size: 1.4em;
     text-align: center;
+    line-height: 20px;
 }
 
 #advance {

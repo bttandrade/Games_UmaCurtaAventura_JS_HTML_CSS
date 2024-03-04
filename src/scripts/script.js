@@ -1,5 +1,6 @@
 const advance = document.getElementById('advance');
 const prologue = document.getElementById('prologue');
+const text = document.getElementById('text');
 
 const nameLocation = document.getElementById('location');
 const currentDay = document.getElementById('days');
@@ -25,17 +26,18 @@ const hero = {
     stamina: 0,
     maxStamina: 100,
     xp: 0,
-    gold: 1000,
+    gold: 150,
     daysPlaying: 1,
     armor: 'Roupa de Couro (def: 2)',
     def: 2,
     nextLevel: 100,
-    damage: 400,
+    damage: 1000,
     arrowDmg: 30,
     chanceToShoot: 4,
     bow: false,
     dodgeBuff: false,
     dodgeChance: 3,
+    protection: false,
 }
 
 const locationMap = [
@@ -91,8 +93,8 @@ const locationMap = [
                 name: 'Em combate.',
                 buttons: [
                     { btntxt: 'Atacar', btnfunc: attack },
-                    { btntxt: 'Esquivar', btnfunc: dodge },
                     { btntxt: 'Usar poção', btnfunc: usePotion },
+                    { btntxt: 'Esquivar', btnfunc: dodge },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: 'Fugir', btnfunc: flee },
@@ -185,8 +187,8 @@ const locationMap = [
                 name: 'Em combate.',
                 buttons: [
                     { btntxt: 'Atacar', btnfunc: attack },
-                    { btntxt: 'Esquivar', btnfunc: dodge },
                     { btntxt: 'Usar poção', btnfunc: usePotion },
+                    { btntxt: 'Esquivar', btnfunc: dodge },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: 'Fugir', btnfunc: flee },
@@ -254,22 +256,22 @@ const locationMap = [
                 ]
             },
             {
-                name: 'Entrada da Tumba.',
+                name: 'Tumba',
                 buttons: [
-                    { btntxt: 'Entrar', btnfunc: exploreTumb },
+                    { btntxt: 'Continuar', btnfunc: exploreTumb },
                     { btntxt: 'Usar poção', btnfunc: usePotion },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: 'Voltar', btnfunc: moveToVillageC },
-                ],
+                ]
             },
             {
                 name: 'Em combate.',
                 buttons: [
                     { btntxt: 'Atacar', btnfunc: attack },
-                    { btntxt: 'Esquivar', btnfunc: dodge },
                     { btntxt: 'Usar poção', btnfunc: usePotion },
+                    { btntxt: 'Esquivar', btnfunc: dodge },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: 'Fugir', btnfunc: flee },
@@ -298,15 +300,15 @@ const locationMap = [
                 ]
             },
             {
-                name: 'Tumba',
+                name: 'Entrada da Tumba.',
                 buttons: [
-                    { btntxt: 'Continuar', btnfunc: exploreTumb },
+                    { btntxt: 'Entrar', btnfunc: exploreTumb },
                     { btntxt: 'Usar poção', btnfunc: usePotion },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: 'Voltar', btnfunc: moveToVillageC },
-                ]
+                ],
             },
             {
                 name: 'Tumba',
@@ -322,8 +324,8 @@ const locationMap = [
             {
                 name: 'Tumba',
                 buttons: [
-                    { btntxt: 'Pegar livro', btnfunc: template },
-                    { btntxt: 'Usar poção', btnfunc: usePotion },
+                    { btntxt: 'Destruir altar', btnfunc: destroyAltar },
+                    { btntxt: 'Pegar livro', btnfunc: getBook },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
@@ -333,7 +335,7 @@ const locationMap = [
             {
                 name: 'Entrada do Grande Salão',
                 buttons: [
-                    { btntxt: 'Enfrentar o Bruxo', btnfunc: template },
+                    { btntxt: 'Enfrentar o Bruxo', btnfunc: tumbBoss },
                     { btntxt: 'Usar poção', btnfunc: usePotion },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
@@ -365,39 +367,67 @@ const inventory = {
 
 const monsters = [
     {
-        name: 'Lobo Selvagem',
+        name: 'um Lobo Selvagem',
         atk: 5,
         vida: 40,
         xp: 18,
         gold: 8,
     },
     {
-        name: 'Lobo Selvagem Gigante',
+        name: 'o Lobo Selvagem Gigante',
         atk: 20,
         vida: 150,
         xp: 58,
         gold: 78,
     },
     {
-        name: 'Goblin',
-        atk: 15,
-        vida: 80,
+        name: 'um Goblin',
+        atk: 12,
+        vida: 60,
         xp: 28,
         gold: 18,
     },
     {
-        name: 'Orc',
-        atk: 25,
-        vida: 110,
+        name: 'um Orc',
+        atk: 22,
+        vida: 100,
         xp: 48,
         gold: 28,
     },
     {
-        name: 'Troll',
-        atk: 50,
-        vida: 300,
+        name: ' um Troll',
+        atk: 44,
+        vida: 280,
         xp: 148,
         gold: 98,
+    },
+    {
+        name: 'um Esqueleto Guerreiro',
+        atk: 26,
+        vida: 140,
+        xp: 62,
+        gold: 42,
+    },
+    {
+        name: 'um Esqueleto Arqueiro',
+        atk: 38,
+        vida: 100,
+        xp: 74,
+        gold: 58,
+    },
+    {
+        name: 'o Bruxo',
+        atk: 84,
+        vida: 600,
+        xp: 500,
+        gold: 500,
+    },
+    {
+        name: 'o Bruxo Enfraquecido',
+        atk: 52,
+        vida: 300,
+        xp: 500,
+        gold: 500,
     },
 ];
 
@@ -559,7 +589,7 @@ function covilBoss() {
 }
 
 function fightingCovil() {
-    if (wolfKilled > 9) {
+    if (wolfKilled > 4) {
         currentMonsterFight = 1;
         covilBoss();
     } else {
@@ -606,7 +636,7 @@ function moveToTavernB() {
 }
 
 function fightingMontain() {
-    let random = Math.floor(Math.random() * 8);
+    let random = Math.floor(Math.random() * 7);
     if (random == 0) {
         currentMonsterFight = 4
         fighting();
@@ -656,14 +686,13 @@ function moveToTavernC() {
 
 function moveToTumb() {
     resetTxt();
-    updateLocation(2, 3);
+    updateLocation(2, 7);
 }
 
 function startTumb() {
     moveCount++;
     resetTxt();
-    updateLocation(2, 7);
-    //console.log(moveCount);
+    updateLocation(2, 3);
 }
 
 function exploreTumb() {
@@ -671,7 +700,6 @@ function exploreTumb() {
         resetTxt();
         updateLocation(2, 8);
         description.innerHTML += '<br>O caminho se divide a frente.';
-        //alert('teste');
     } else if (right && moveCount == 8) {
         resetTxt();
         updateLocation(2, 10);
@@ -686,11 +714,24 @@ function exploreTumb() {
     } else if (right && moveCount == 14) {
         resetTxt();
         updateLocation(2, 9);
+        if (hero.protection) {
+            btns[0].textContent = '. . .';
+            btns[0].onclick = template;
+        }
+        if (inventory.livros.indexOf('Livro Sobre Esquiva II') != -1) {
+            btns[1].textContent = '. . .';
+            btns[1].onclick = template;
+        }
     } else {
-        startTumb();
-        description.innerHTML += '<br>Você decide ir em frente.';
+        let random = Math.floor(Math.random() * 3);
+        if (random == 0) {
+            moveCount++
+            fightingTumb();
+        } else {
+            startTumb();
+            description.innerHTML += '<br>Você decide ir em frente.';
+        }
     }
-    console.log(moveCount);
 }
 
 function moveLeft() {
@@ -703,6 +744,43 @@ function moveRight() {
     right = true;
     startTumb();
     description.innerHTML += '<br>Você decide virar a direita.';
+}
+
+function getBook() {
+    inventory.livros.push('Livro Sobre Esquiva II');
+    hero.dodgeChance--;
+    btns[1].textContent = '. . .';
+    btns[1].onclick = template;
+    description.innerHTML += '<br>Você pegou o Livro Sobre Esquiva II.<br>Ficou mais fácil esquivar.'
+    updtHeroStats();
+}
+
+function destroyAltar() {
+    hero.protection = true;
+    btns[0].textContent = '. . .';
+    btns[0].onclick = template;
+    description.innerHTML += '<br>Você destruiu o altar que fortalecia o Bruxo.'
+}
+
+function fightingTumb() {
+    let random = Math.floor(Math.random() * 3);
+    if (random == 0) {
+        currentMonsterFight = 6;
+        fighting();
+    } else {
+        currentMonsterFight = 5;
+        fighting();
+    }
+}
+
+function tumbBoss() {
+    if (hero.protection) {
+        currentMonsterFight = 8;
+        fighting();
+    } else {
+        currentMonsterFight = 7;
+        fighting();
+    }
 }
 
 // SHOP
@@ -805,8 +883,11 @@ function buyBow() {
 
 function buyBook(name, button) {
     inventory.livros.push(name);
-    //console.log(inventory.livros);
-    description.innerHTML += `<br>Você comprou o ${name}.<br>Seu dano aumentou.`
+    if (name == 'Livro Sobre Esquiva I') {
+        description.innerHTML += `<br>Você comprou o ${name}.<br>Ficou mais fácil esquivar.`
+    } else {
+        description.innerHTML += `<br>Você comprou o ${name}.<br>Seu dano aumentou.`
+    }
     btns[button].textContent = '. . .';
     btns[button].onclick = template;
 }
@@ -849,7 +930,7 @@ function buyBookBow1() {
         buyBook('Livro Sobre Arco I', 4);
         hero.gold -= 150;
         hero.arrowDmg += 10;
-        hero.chanceToShoot = 3;
+        hero.chanceToShoot--;
         updtHeroStats();
     } else {
         description.innerHTML += '<br>Você não tem ouro suficiente.';
@@ -861,7 +942,7 @@ function buyBookBow2() {
         buyBook('Livro Sobre Arco II', 3);
         hero.gold -= 150;
         hero.arrowDmg += 10;
-        hero.chanceToShoot = 2;
+        hero.chanceToShoot--;
         updtHeroStats();
     } else {
         description.innerHTML += '<br>Você não tem ouro suficiente.';
@@ -872,8 +953,7 @@ function buyBookDodge() {
     if (hero.gold >= 150) {
         buyBook('Livro Sobre Esquiva I', 4);
         hero.gold -= 150;
-        hero.arrowDmg += 10;
-        hero.chanceToShoot = 3;
+        hero.dodgeChance--;
         updtHeroStats();
     } else {
         description.innerHTML += '<br>Você não tem ouro suficiente.';
@@ -882,9 +962,11 @@ function buyBookDodge() {
 
 // COMBAT
 function fighting() {
+    let staminaUsed = 20 - hero.level * 2 + (currentLocation * 2);
+    staminaUsed < 0 ? staminaUsed = 0 : staminaUsed; 
     currentMonsterLife = monsters[currentMonsterFight].vida;
-    if (hero.stamina <= hero.maxStamina - 20) {
-        hero.stamina += 20;
+    if (hero.stamina <= hero.maxStamina - staminaUsed) {
+        hero.stamina += staminaUsed;
         updtHeroStats();
         battle();
     } else {
@@ -893,37 +975,26 @@ function fighting() {
 }
 
 function battle() {
-    //console.log(hero.damage);
     if (currentMonsterLife <= 0) {
         let getGold = monsters[currentMonsterFight].gold + getRandNumb();
         let getXp = (monsters[currentMonsterFight].xp - hero.level*4) + getRandNumb();
         getXp < 0 ? getXp = 0 : getXp;
-        description.innerHTML += '<br>Você derrotou um ' + monsters[currentMonsterFight].name + '.';
+        description.innerHTML += '<br>Você derrotou ' + monsters[currentMonsterFight].name + '.';
         description.innerHTML += `<br>Você ganhou ${getXp} de xp e ${getGold} de ouro.`;
         changeButtons(currentLocation, 5);
         setTimeout(() => {
             resetTxt();
             updateLocation(currentLocation, 3);
         }, 1500);
-        monsterDead(currentLocation);
-        //updateLocation(0, 3);
-        //console.log(wolfKilled);
         hero.xp += getXp;
         hero.gold += getGold;
         lookForLevelUp();
-        if (currentMonsterFight == 1) {
-            wolfKilled = 0;
-            alert('Você derrotou o Lobo Selvagem Gigante e decide seguir sua aventura.');
-            resetTxt();
-            moveToVillageB();
-            //updateLocation(1, 0);
-            return;
-        }
+        monsterDead(currentLocation);
     } else {
         updateLocation(currentLocation, 4);
         addBowButton(hero.bow);
         resetTxt();
-        description.innerHTML += 'Você está enfrentando um ' + monsters[currentMonsterFight].name + '.';
+        description.innerHTML += 'Você está enfrentando ' + monsters[currentMonsterFight].name + '.';
         addMonster();
     }
 }
@@ -1048,17 +1119,29 @@ function monsterAtk() {
 }
 
 function monsterDead(location) {
-    if (location == 0) {
-        wolfKilled++;
-    } else {
-        if (currentMonsterFight == 4) {
-            trollsKilled++;
-            locationMap[1].objective = `Missão: Mate todos os Trolls ${trollsKilled}/4`;
-            if (trollsKilled == 4) {
-                alert('Voce terminou a parte 2');
+    setTimeout(() => {
+        if (location == 0) {
+            wolfKilled++;
+            if (currentMonsterFight == 1) {
+                wolfKilled = 0;
+                hero.daysPlaying++;
+                hero.stamina = 0;
+                toSecondPart();
+            }
+        } else {
+            if (currentMonsterFight == 4) {
+                trollsKilled++;
+                locationMap[1].objective = `Missão: Mate todos os Trolls ${trollsKilled}/4`;
+                if (trollsKilled == 4) {
+                    hero.daysPlaying++;
+                    hero.stamina = 0;
+                    toFinalPart();
+                }
+            } else if (currentMonsterFight == 7 || currentMonsterFight == 8) {
+                end();
             }
         }
-    }
+    }, 1000);
 }
 
 // SMITH
@@ -1163,7 +1246,7 @@ function listenTavernA() {
         description.innerHTML += '<br>Você começa a escutar algumas conversas.' +
         '<br>Homem A: ... que há um Lobo Selvagem Gigante no fundo do covil.' +
         '<br>Homem B: Também ouvi falar nisso, mas parece que para chegar a ele, ' +  
-        'tem que derrotar pelo menos 10 lobos selvagens.' +
+        'tem que derrotar vários lobos selvagens.' +
         '<br>Homem A: Quem seria louco de ir tão fundo.'
     } else {
         description.innerHTML += '<br>Você começa a escutar algumas conversas.' +
@@ -1177,8 +1260,9 @@ function listenTavernB() {
     updateLocation(1, 2)
     let random = Math.floor(Math.random() * 3);
     if (random === 1) {
-        description.innerHTML += '<br>Homem A: ... que existem 4 Trolls nos Arredores da Montanha.' +
-        '<br>Homem B: Só o que podemos fazer é rezar para que eles vão embora.';
+        description.innerHTML += '<br>Homem A: ... quem iria explorar os arredores, se a qualquer ' +
+        'momento um Troll pode aparecer?'
+        '<br>Homem B: So contando com a sorte para não encontrá-los.';
     } else {
         description.innerHTML += '<br>Homem A: O inverno será bem difícil.' +
         '<br>Homem B: Claro, com Goblins e Orcs atacando nos arredores, como os suprimentos ' +
@@ -1191,10 +1275,15 @@ function listenTavernC() {
     resetTxt();
     updateLocation(2, 2)
     let random = Math.floor(Math.random() * 3);
-    if (random === 1) {
-        description.innerHTML += '<br>Homem A:...';
+    if (random == 1) {
+        description.innerHTML += '<br>Homem A:Ouviu os boatos sobre o Bruxo na Tumba?' +
+        '<br>Homem B: Ouvi sim, também ouvi que há um altar dentro da tumba que fortalece qualquer ' +
+        'um que consiga tomá-lo.' +
+        '<br>Homem A: Caso o Bruxo tenha enfeitiçado o altar, ele ficará quase invencível.'
+        '<br>Homem B: Prefiro nem imaginar isso.';
     } else {
-        description.innerHTML += '<br>Homem B:...';
+        description.innerHTML += '<br>Homem A:... falar que um Bruxo tomou aquela velha Tumba?' +
+        '<br>Homem B: Ouvi boatos, mas prefiro acreditar que não sejam verdade.';
     }
 }
 
@@ -1225,18 +1314,45 @@ function seeInventory() {
 }
 
 // PLAY
-
-// advance.addEventlistenTavernAer('click', () => {
-//     prologue.style.display = 'none';
-//     //alert('funciona');
-//     startGame();
-//     updtHeroStats();
-// });
+advance.onclick = startGame;
 
 function startGame() {
+    prologue.style.display = 'none';
+    moveToVillageA();
+    updtHeroStats();
+}
+
+function toSecondPart() {
+    prologue.style.display = 'flex';
+    text.textContent = 'Você derrotou o Lobo Selvagem Gigante fazendo com que ' +
+    'os demais fugissem. Após uma noite de descanso você decide continuar sua jornada ' +
+    'chegando a Vila da Montanha que está em constante medo de Trolls nos arredores. ' +
+    'Acabe com todos os Trolls.';
+    advance.onclick = startSecondPart;
+}
+
+function startSecondPart() {
+    prologue.style.display = 'none';
+    moveToVillageB();
+    updtHeroStats();
+}
+
+function toFinalPart() {
+    prologue.style.display = 'flex';
+    text.textContent = 'Você matou todos os Trolls que viviam nos arredores. ' +
+    'Após uma noite de descanso você decide continuar sua jornada chegando a Vila próxima a ' +
+    'Tumba onde o Bruxo está tentando realizar seu ritual. O momento de enfrentá-lo está perto.';
+    advance.onclick = startFinalPart;
+}
+
+function startFinalPart() {
+    prologue.style.display = 'none';
     moveToVillageC();
     updtHeroStats();
 }
 
-startGame();
-updtHeroStats();
+function end() {
+    prologue.style.display = 'flex';
+    text.textContent = 'Parabéns por completar o Jogo.';
+    advance.onclick = location.href = '/./index.html';
+}
