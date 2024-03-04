@@ -7,6 +7,9 @@ const currentObjctive = document.getElementById('mission');
 const description = document.getElementById('description');
 const btns = document.getElementsByClassName('btn');
 
+const btnBack = document.getElementById('btn-back');
+const btnFront = document.getElementById('btn-front');
+
 const levelTxt = document.getElementById('lvl');
 const healthTxt = document.getElementById('health');
 const staminaTxt = document.getElementById('stamina');
@@ -38,17 +41,17 @@ const hero = {
 const locationMap = [
     {
         location: "Floresta",
-        objective: 'Missão: Destrua o covil dos lobos selvagens',
+        objective: 'Missão: Destrua o covil dos Lobos',
         places: [
             {
-                name: 'Vila da Floresta.',
+                name: 'Vila próxima a Floresta.',
                 buttons: [
-                    { btntxt: 'Ir ao covil', btnfunc: moveToCovil },
+                    { btntxt: 'Ir a entrada do covil', btnfunc: moveToCovil },
                     { btntxt: 'Treinar', btnfunc: training },
                     { btntxt: 'Dormir', btnfunc: recover },
                     { btntxt: 'Ir a loja', btnfunc: moveToShopA },
                     { btntxt: '. . .', btnfunc: template },
-                    { btntxt: 'Ir a taverna', btnfunc: moveToTabernA },
+                    { btntxt: 'Ir a taverna', btnfunc: moveToTavernA },
                 ],
             },
             {
@@ -110,7 +113,7 @@ const locationMap = [
                 name: 'Taverna',
                 buttons: [
                     { btntxt: 'Pedir cerveja', btnfunc: buyBeer },
-                    { btntxt: 'Escutar conversas', btnfunc: listenTabernA },
+                    { btntxt: 'Escutar conversas', btnfunc: listenTavernA },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
@@ -135,14 +138,14 @@ const locationMap = [
         objective: 'Missão: Mate todos os Trolls 0/4',
         places: [
             {
-                name: 'Vila da Montanha.',
+                name: 'Vila próxima a Montanha.',
                 buttons: [
                     { btntxt: 'Explorar os arredores', btnfunc: exploreMontain },
                     { btntxt: 'Treinar', btnfunc: training },
                     { btntxt: 'Dormir', btnfunc: recover },
                     { btntxt: 'Ir a loja', btnfunc: moveToShopB },
                     { btntxt: 'Ir ao ferreiro', btnfunc: moveToSmithB },
-                    { btntxt: 'Ir a taverna', btnfunc: moveToTabernB },
+                    { btntxt: 'Ir a taverna', btnfunc: moveToTavernB },
                 ],
             },
             {
@@ -160,7 +163,7 @@ const locationMap = [
                 name: 'Taverna',
                 buttons: [
                     { btntxt: 'Pedir cerveja', btnfunc: buyBeer },
-                    { btntxt: 'Escutar conversas', btnfunc: listenTabernB },
+                    { btntxt: 'Escutar conversas', btnfunc: listenTavernB },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
@@ -215,17 +218,17 @@ const locationMap = [
     },
     {
         location: "Tumba",
-        objective: 'Missão: Mate o Lorde Vampiro',
+        objective: 'Missão: Mate o Bruxo',
         places: [
             {
                 name: 'Vila próxima a Tumba.',
                 buttons: [
-                    { btntxt: 'Ir a tumba', btnfunc: template },
+                    { btntxt: 'Ir a entrada da tumba', btnfunc: moveToTumb },
                     { btntxt: 'Treinar', btnfunc: training },
                     { btntxt: 'Dormir', btnfunc: recover },
                     { btntxt: 'Ir a loja', btnfunc: moveToShopC },
                     { btntxt: 'Ir ao ferreiro', btnfunc: moveToSmithC },
-                    { btntxt: 'Ir a taverna', btnfunc: moveToTabernC },
+                    { btntxt: 'Ir a taverna', btnfunc: moveToTavernC },
                 ],
             },
             {
@@ -243,7 +246,7 @@ const locationMap = [
                 name: 'Taverna',
                 buttons: [
                     { btntxt: 'Pedir cerveja', btnfunc: buyBeer },
-                    { btntxt: 'Escutar conversas', btnfunc: listenTabernC },
+                    { btntxt: 'Escutar conversas', btnfunc: listenTavernC },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
@@ -253,7 +256,7 @@ const locationMap = [
             {
                 name: 'Entrada da Tumba.',
                 buttons: [
-                    { btntxt: 'Entrar', btnfunc: fightingMontain },
+                    { btntxt: 'Entrar', btnfunc: exploreTumb },
                     { btntxt: 'Usar poção', btnfunc: usePotion },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
@@ -288,6 +291,61 @@ const locationMap = [
                 buttons: [
                     { btntxt: 'Armadura de Platina', btnfunc: buyArmor3 },
                     { btntxt: 'Armadura de Platina Completa', btnfunc: buyArmor4 },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageC },
+                ]
+            },
+            {
+                name: 'Tumba',
+                buttons: [
+                    { btntxt: 'Continuar', btnfunc: exploreTumb },
+                    { btntxt: 'Usar poção', btnfunc: usePotion },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageC },
+                ]
+            },
+            {
+                name: 'Tumba',
+                buttons: [
+                    { btntxt: 'Esquerda', btnfunc: moveLeft },
+                    { btntxt: 'Usar poção', btnfunc: usePotion },
+                    { btntxt: 'Direita', btnfunc: moveRight },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageC },
+                ]
+            },
+            {
+                name: 'Tumba',
+                buttons: [
+                    { btntxt: 'Pegar livro', btnfunc: template },
+                    { btntxt: 'Usar poção', btnfunc: usePotion },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageC },
+                ]
+            },
+            {
+                name: 'Entrada do Grande Salão',
+                buttons: [
+                    { btntxt: 'Enfrentar o Bruxo', btnfunc: template },
+                    { btntxt: 'Usar poção', btnfunc: usePotion },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageC },
+                ]
+            },
+            {
+                name: 'Beco Sem Saída',
+                buttons: [
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: '. . .', btnfunc: template },
@@ -348,9 +406,31 @@ let currentMonsterFight;
 let currentMonsterLife;
 let wolfKilled = 0;
 let trollsKilled = 0;
+let moveCount = 0;
+let right = false;
+let left = false;
+
 invBtn.onclick = seeInventory;
+btnFront.onclick = goFront;
+btnBack.onclick = goBack;
 
 // GLOBAL
+function goFront() {
+    if (currentLocation == 0) {
+        moveToVillageB();
+    } else if (currentLocation == 1) {
+        moveToVillageC();
+    }
+}
+
+function goBack() {
+    if (currentLocation == 2) {
+        moveToVillageB();
+    } else if (currentLocation == 1) {
+        moveToVillageA();
+    }
+}
+
 function updtHeroStats() {
     levelTxt.innerText = hero.level;
     healthTxt.innerText = `${hero.health}/${hero.maxHealth}`;
@@ -438,9 +518,10 @@ function gameOver() {
     window.location.href = '/./index.html';
 }
 
-
 // VILLAGE A
 function moveToVillageA() {
+    btnBack.disabled = true;
+    btnFront.disabled = false;
     resetTxt();
     updateLocation(0, 0);
     currentLocation = 0;
@@ -459,7 +540,7 @@ function moveToShopA() {
     lookForStuff(0);
 }
 
-function moveToTabernA() {
+function moveToTavernA() {
     resetTxt();
     updateLocation(0, 6);
 }
@@ -487,9 +568,10 @@ function fightingCovil() {
     }
 }
 
-
 // VILLAGE B
 function moveToVillageB() {
+    btnBack.disabled = false;
+    btnFront.disabled = false;
     resetTxt();
     updateLocation(1, 0);
     currentLocation = 1;
@@ -518,7 +600,7 @@ function moveToSmithB() {
     }
 }
 
-function moveToTabernB() {
+function moveToTavernB() {
     resetTxt();
     updateLocation(1, 2);
 }
@@ -537,12 +619,16 @@ function fightingMontain() {
     }
 }
 
-
 // VILLAGE C
 function moveToVillageC() {
+    btnBack.disabled = false;
+    btnFront.disabled = true;
     resetTxt();
     updateLocation(2, 0);
     currentLocation = 2;
+    left = false;
+    right = false;
+    moveCount = 0;
 }
 
 function moveToShopC() {
@@ -563,11 +649,61 @@ function moveToSmithC() {
     }
 }
 
-function moveToTabernC() {
+function moveToTavernC() {
     resetTxt();
     updateLocation(2, 2);
 }
 
+function moveToTumb() {
+    resetTxt();
+    updateLocation(2, 3);
+}
+
+function startTumb() {
+    moveCount++;
+    resetTxt();
+    updateLocation(2, 7);
+    //console.log(moveCount);
+}
+
+function exploreTumb() {
+    if (moveCount == 4) {
+        resetTxt();
+        updateLocation(2, 8);
+        description.innerHTML += '<br>O caminho se divide a frente.';
+        //alert('teste');
+    } else if (right && moveCount == 8) {
+        resetTxt();
+        updateLocation(2, 10);
+    } else if (left && moveCount == 10) {
+        left = false;
+        resetTxt();
+        updateLocation(2, 8);
+        description.innerHTML += '<br>O caminho se divide a frente.';
+    } else if (left && moveCount == 17) {
+        resetTxt();
+        updateLocation(2, 11);
+    } else if (right && moveCount == 14) {
+        resetTxt();
+        updateLocation(2, 9);
+    } else {
+        startTumb();
+        description.innerHTML += '<br>Você decide ir em frente.';
+    }
+    console.log(moveCount);
+}
+
+function moveLeft() {
+    left = true;
+    startTumb();
+    description.innerHTML += '<br>Você decide virar a esquerda.';
+}
+
+function moveRight() {
+    right = true;
+    startTumb();
+    description.innerHTML += '<br>Você decide virar a direita.';
+}
 
 // SHOP
 function buyPotion() {
@@ -743,7 +879,6 @@ function buyBookDodge() {
         description.innerHTML += '<br>Você não tem ouro suficiente.';
     }
 }
-
 
 // COMBAT
 function fighting() {
@@ -926,7 +1061,6 @@ function monsterDead(location) {
     }
 }
 
-
 // SMITH
 function lookForArmor() {
     if (hero.armor.includes('6') || hero.armor.includes('12')) {
@@ -1000,7 +1134,6 @@ function buyArmor4() {
     }
 }
 
-
 // TAVERN
 function buyBeer() {
     if (hero.stamina > 0) {
@@ -1022,7 +1155,7 @@ function buyBeer() {
     }
 }
 
-function listenTabernA() {
+function listenTavernA() {
     resetTxt();
     updateLocation(0, 6)
     let random = Math.floor(Math.random() * 3);
@@ -1039,7 +1172,7 @@ function listenTabernA() {
     }
 }
 
-function listenTabernB() {
+function listenTavernB() {
     resetTxt();
     updateLocation(1, 2)
     let random = Math.floor(Math.random() * 3);
@@ -1054,7 +1187,7 @@ function listenTabernB() {
     }
 }
 
-function listenTabernC() {
+function listenTavernC() {
     resetTxt();
     updateLocation(2, 2)
     let random = Math.floor(Math.random() * 3);
@@ -1064,7 +1197,6 @@ function listenTabernC() {
         description.innerHTML += '<br>Homem B:...';
     }
 }
-
 
 // INVENTORY
 function showInventory() {
@@ -1092,10 +1224,9 @@ function seeInventory() {
     description.innerHTML += '<br>Você abre a mochila e vê:' + showInventory();
 }
 
-
 // PLAY
 
-// advance.addEventlistenTabernAer('click', () => {
+// advance.addEventlistenTavernAer('click', () => {
 //     prologue.style.display = 'none';
 //     //alert('funciona');
 //     startGame();
