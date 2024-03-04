@@ -57,25 +57,13 @@
     text-align: center;
 }
 
-#textAndButtons {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-}
-
-.btn-back-front {
-    height: 20px;
-    width: 20px;
-    border: 1px solid;
-}
-
 #img-box {
     font-size: 0.9em;
     overflow: auto;
     border: 3px double;
     border-radius: 5px;
     background-color: rgb(226, 226, 215);
-    line-height: 1.4em;
+    line-height: 1.5em;
     padding: 5px;
     width: 380px;
     height: 280px;

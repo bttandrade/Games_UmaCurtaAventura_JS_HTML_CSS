@@ -8,9 +8,6 @@ const currentObjctive = document.getElementById('mission');
 const description = document.getElementById('description');
 const btns = document.getElementsByClassName('btn');
 
-const btnBack = document.getElementById('btn-back');
-const btnFront = document.getElementById('btn-front');
-
 const levelTxt = document.getElementById('lvl');
 const healthTxt = document.getElementById('health');
 const staminaTxt = document.getElementById('stamina');
@@ -26,15 +23,15 @@ const hero = {
     stamina: 0,
     maxStamina: 100,
     xp: 0,
+    nextLevel: 100,
     gold: 150,
     daysPlaying: 1,
     armor: 'Roupa de Couro (def: 2)',
     def: 2,
-    nextLevel: 100,
-    damage: 1000,
+    damage: 4,
+    bow: false,
     arrowDmg: 30,
     chanceToShoot: 4,
-    bow: false,
     dodgeBuff: false,
     dodgeChance: 3,
     protection: false,
@@ -367,63 +364,63 @@ const inventory = {
 
 const monsters = [
     {
-        name: 'um Lobo Selvagem',
+        name: 'Lobo Selvagem',
         atk: 5,
         vida: 40,
         xp: 18,
         gold: 8,
     },
     {
-        name: 'o Lobo Selvagem Gigante',
+        name: 'Lobo Selvagem Gigante',
         atk: 20,
         vida: 150,
         xp: 58,
         gold: 78,
     },
     {
-        name: 'um Goblin',
+        name: 'Goblin',
         atk: 12,
         vida: 60,
         xp: 28,
         gold: 18,
     },
     {
-        name: 'um Orc',
+        name: 'Orc',
         atk: 22,
         vida: 100,
         xp: 48,
         gold: 28,
     },
     {
-        name: ' um Troll',
+        name: 'Troll',
         atk: 44,
         vida: 280,
         xp: 148,
         gold: 98,
     },
     {
-        name: 'um Esqueleto Guerreiro',
+        name: 'Esqueleto Guerreiro',
         atk: 26,
         vida: 140,
         xp: 62,
         gold: 42,
     },
     {
-        name: 'um Esqueleto Arqueiro',
+        name: 'Esqueleto Arqueiro',
         atk: 38,
         vida: 100,
         xp: 74,
         gold: 58,
     },
     {
-        name: 'o Bruxo',
+        name: 'Bruxo',
         atk: 84,
         vida: 600,
         xp: 500,
         gold: 500,
     },
     {
-        name: 'o Bruxo Enfraquecido',
+        name: 'Bruxo Enfraquecido',
         atk: 52,
         vida: 300,
         xp: 500,
@@ -441,26 +438,9 @@ let right = false;
 let left = false;
 
 invBtn.onclick = seeInventory;
-btnFront.onclick = goFront;
-btnBack.onclick = goBack;
+advance.onclick = startGame;
 
 // GLOBAL
-function goFront() {
-    if (currentLocation == 0) {
-        moveToVillageB();
-    } else if (currentLocation == 1) {
-        moveToVillageC();
-    }
-}
-
-function goBack() {
-    if (currentLocation == 2) {
-        moveToVillageB();
-    } else if (currentLocation == 1) {
-        moveToVillageA();
-    }
-}
-
 function updtHeroStats() {
     levelTxt.innerText = hero.level;
     healthTxt.innerText = `${hero.health}/${hero.maxHealth}`;
@@ -489,7 +469,6 @@ function setTxt (currentLocation) {
 function changeButtons(currentLocation, currentPlace) {
     for (let i = 0; i < 6; i++) {
         btns[i].textContent = locationMap[currentLocation].places[currentPlace].buttons[i].btntxt;
-        //console.log(btns[i].textContent = locationMap[currentLocation].places[currentPlace].buttons[i].btntxt);
         btns[i].onclick = locationMap[currentLocation].places[currentPlace].buttons[i].btnfunc;
     }
 }
@@ -544,14 +523,16 @@ function getRandNumb() {
 }
 
 function gameOver() {
-    alert('Você morreu!');
-    window.location.href = '/./index.html';
+    setTimeout(() => {
+        prologue.style.display = 'flex';
+        text.innerText = 'Você morreu!';
+        advance.innerText = 'Voltar'
+        advance.onclick = toStartAgain;
+    }, 1000);
 }
 
 // VILLAGE A
 function moveToVillageA() {
-    btnBack.disabled = true;
-    btnFront.disabled = false;
     resetTxt();
     updateLocation(0, 0);
     currentLocation = 0;
@@ -566,7 +547,6 @@ function moveToShopA() {
     resetTxt();
     updateLocation(0, 2);
     description.innerHTML += '<br>Você olha a loja e vê:<br>Um estoque de Poções.'
-    //console.log(!inventory.livros.indexOf('Livro Sobre Espada II') != -1);
     lookForStuff(0);
 }
 
@@ -600,8 +580,6 @@ function fightingCovil() {
 
 // VILLAGE B
 function moveToVillageB() {
-    btnBack.disabled = false;
-    btnFront.disabled = false;
     resetTxt();
     updateLocation(1, 0);
     currentLocation = 1;
@@ -651,8 +629,6 @@ function fightingMontain() {
 
 // VILLAGE C
 function moveToVillageC() {
-    btnBack.disabled = false;
-    btnFront.disabled = true;
     resetTxt();
     updateLocation(2, 0);
     currentLocation = 2;
@@ -811,60 +787,46 @@ function lookForStuff(shop) {
         if (inventory.livros.indexOf('Livro Sobre Espada II') != -1) {
             btns[4].textContent = '. . .';
             btns[4].onclick = template;
-            //console.log(inventory.livros);
         } else {
             description.innerHTML += '<br>Livro Sobre Espada II.';
-            //console.log(inventory.livros);
         }
     } else if(shop == 1) {
         if (hero.bow) {
             btns[2].textContent = '. . .';
             btns[2].onclick = template;
-            //console.log(inventory.livros);
         } else {
             description.innerHTML += '<br>Arco com flechas.';
-            //console.log(inventory.livros);
         }
         if (inventory.livros.indexOf('Livro Sobre Espada III') != -1) {
             btns[3].textContent = '. . .';
             btns[3].onclick = template;
-            //console.log(inventory.livros);
         } else {
             description.innerHTML += '<br>Livro Sobre Espada III.';
-            //console.log(inventory.livros);
         }
         if (inventory.livros.indexOf('Livro Sobre Arco I') != -1) {
             btns[4].textContent = '. . .';
             btns[4].onclick = template;
-            //console.log(inventory.livros);
         } else {
             description.innerHTML += '<br>Livro Sobre Arco I.';
-            //console.log(inventory.livros);
         }
     } else {
         if (inventory.livros.indexOf('Livro Sobre Espada IV') != -1) {
             btns[2].textContent = '. . .';
             btns[2].onclick = template;
-            //console.log(inventory.livros);
         } else {
             description.innerHTML += '<br>Livro Sobre Espada IV.';
-            //console.log(inventory.livros);
         }
         if (inventory.livros.indexOf('Livro Sobre Arco II') != -1) {
             btns[3].textContent = '. . .';
             btns[3].onclick = template;
-            //console.log(inventory.livros);
         } else {
             description.innerHTML += '<br>Livro Sobre Arco II.';
-            //console.log(inventory.livros);
         }
         if (inventory.livros.indexOf('Livro Sobre Esquiva I') != -1) {
             btns[4].textContent = '. . .';
             btns[4].onclick = template;
-            //console.log(inventory.livros);
         } else {
             description.innerHTML += '<br>Livro Sobre Esquiva I.';
-            //console.log(inventory.livros);
         }
     }
 }
@@ -979,8 +941,13 @@ function battle() {
         let getGold = monsters[currentMonsterFight].gold + getRandNumb();
         let getXp = (monsters[currentMonsterFight].xp - hero.level*4) + getRandNumb();
         getXp < 0 ? getXp = 0 : getXp;
-        description.innerHTML += '<br>Você derrotou ' + monsters[currentMonsterFight].name + '.';
-        description.innerHTML += `<br>Você ganhou ${getXp} de xp e ${getGold} de ouro.`;
+        if (currentMonsterFight == 1 || currentMonsterFight == 7 || currentMonsterFight == 8) {
+            description.innerHTML += '<br>Você derrotou o ' + monsters[currentMonsterFight].name + '.';
+            description.innerHTML += `<br>Você ganhou ${getXp} de xp e ${getGold} de ouro.`;
+        } else {
+            description.innerHTML += '<br>Você derrotou um ' + monsters[currentMonsterFight].name + '.';
+            description.innerHTML += `<br>Você ganhou ${getXp} de xp e ${getGold} de ouro.`;
+        }
         changeButtons(currentLocation, 5);
         setTimeout(() => {
             resetTxt();
@@ -994,7 +961,11 @@ function battle() {
         updateLocation(currentLocation, 4);
         addBowButton(hero.bow);
         resetTxt();
-        description.innerHTML += 'Você está enfrentando ' + monsters[currentMonsterFight].name + '.';
+        if (currentMonsterFight == 1 || currentMonsterFight == 7 || currentMonsterFight == 8) {
+            description.innerHTML += 'Você está enfrentando o ' + monsters[currentMonsterFight].name + '.';
+        } else {
+            description.innerHTML += 'Você está enfrentando um ' + monsters[currentMonsterFight].name + '.';
+        }
         addMonster();
     }
 }
@@ -1086,11 +1057,10 @@ function monsterSpecial() {
     let monsterDmg = monsters[currentMonsterFight].atk + getRandNumb() - hero.def - hero.level;
     changeButtons(0, 5);
     setTimeout(() => {
-        description.innerHTML += `<br>${monsters[currentMonsterFight].name} lhe ataca na cabeça.`;
+        description.innerHTML += `<br>${monsters[currentMonsterFight].name} lhe atinge na cabeça.`;
         description.innerHTML += `<br>Você recebeu ${monsterDmg*2} de dano.`;
         setTimeout(() => {
             hero.health -= monsterDmg*2;
-                //resetTxt();
                 battle();
                 updtHeroStats();
                 if (hero.health <= 0) {
@@ -1104,11 +1074,10 @@ function monsterAtk() {
     let monsterDmg = monsters[currentMonsterFight].atk + getRandNumb() - hero.def - hero.level;
     changeButtons(0, 5);
     setTimeout(() => {
-        description.innerHTML += `<br>${monsters[currentMonsterFight].name} lhe ataca.`;
+        description.innerHTML += `<br>${monsters[currentMonsterFight].name.replace('um', '')} lhe ataca.`;
         description.innerHTML += `<br>Você recebeu ${monsterDmg} de dano.`;
         setTimeout(() => {
             hero.health -= monsterDmg;
-                //resetTxt();
                 battle();
                 updtHeroStats();
                 if (hero.health <= 0) {
@@ -1314,8 +1283,6 @@ function seeInventory() {
 }
 
 // PLAY
-advance.onclick = startGame;
-
 function startGame() {
     prologue.style.display = 'none';
     moveToVillageA();
@@ -1351,8 +1318,13 @@ function startFinalPart() {
     updtHeroStats();
 }
 
+function toStartAgain() {
+    location.href = '/./index.html';
+}
+
 function end() {
     prologue.style.display = 'flex';
     text.textContent = 'Parabéns por completar o Jogo.';
-    advance.onclick = location.href = '/./index.html';
+    advance.innerText = 'Finalizar';
+    advance.onclick = toStartAgain;
 }
