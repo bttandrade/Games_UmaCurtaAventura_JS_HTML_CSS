@@ -130,6 +130,17 @@ const locationMap = [
                     { btntxt: 'Voltar', btnfunc: moveToVillageA },
                 ]
             },
+            {
+                name: 'Vila próxima a Floresta.',
+                buttons: [
+                    { btntxt: 'Dormir no relento', btnfunc: recover },
+                    { btntxt: 'Pagar um quarto', btnfunc: recoverHeal },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageA },
+                ],
+            },
         ]
     },
     {
@@ -212,6 +223,17 @@ const locationMap = [
                     { btntxt: '. . .', btnfunc: template },
                     { btntxt: 'Voltar', btnfunc: moveToVillageB },
                 ]
+            },
+            {
+                name: 'Vila próxima a Montanha.',
+                buttons: [
+                    { btntxt: 'Dormir no relento', btnfunc: recover },
+                    { btntxt: 'Pagar um quarto', btnfunc: recoverHeal },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageA },
+                ],
             },
         ]
     },
@@ -351,6 +373,17 @@ const locationMap = [
                     { btntxt: 'Voltar', btnfunc: moveToVillageC },
                 ]
             },
+            {
+                name: 'Vila próxima a Tumba.',
+                buttons: [
+                    { btntxt: 'Dormir no relento', btnfunc: recover },
+                    { btntxt: 'Pagar um quarto', btnfunc: recoverHeal },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: '. . .', btnfunc: template },
+                    { btntxt: 'Voltar', btnfunc: moveToVillageA },
+                ],
+            },
         ]
     },
 ];
@@ -386,42 +419,42 @@ const monsters = [
     },
     {
         name: 'Orc',
-        atk: 22,
+        atk: 20,
         vida: 100,
         xp: 48,
         gold: 28,
     },
     {
         name: 'Troll',
-        atk: 44,
-        vida: 280,
+        atk: 38,
+        vida: 260,
         xp: 148,
         gold: 98,
     },
     {
         name: 'Esqueleto Guerreiro',
-        atk: 26,
-        vida: 140,
+        atk: 23,
+        vida: 130,
         xp: 62,
         gold: 42,
     },
     {
         name: 'Esqueleto Arqueiro',
-        atk: 38,
-        vida: 100,
+        atk: 32,
+        vida: 90,
         xp: 74,
         gold: 58,
     },
     {
         name: 'Bruxo',
-        atk: 84,
+        atk: 72,
         vida: 600,
         xp: 500,
         gold: 500,
     },
     {
         name: 'Bruxo Enfraquecido',
-        atk: 52,
+        atk: 48,
         vida: 300,
         xp: 500,
         gold: 500,
@@ -474,12 +507,15 @@ function changeButtons(currentLocation, currentPlace) {
 }
 
 function training() {
+    let getXp = 20 - hero.level * 2;
     if (hero.stamina + 30 >= hero.maxStamina) {
         description.innerHTML += '<br>Você está cansado demais.';
+    } else if (hero.level >= 10) {
+        description.innerHTML += '<br>Você não consegue mais evoluir apenas treinando.';
     } else {
         hero.stamina += 30;
-        hero.xp += 20;
-        description.innerHTML += `<br>Você ganhou 20 de xp.`;
+        hero.xp += getXp;
+        description.innerHTML += `<br>Você ganhou ${getXp} de xp.`;
         lookForLevelUp()
     }
 }
@@ -500,17 +536,44 @@ function lookForLevelUp() {
     }
 }
 
+function sleep() {
+    resetTxt();
+    description.innerHTML += '<br>Você procura um lugar para dormir.';
+    if (currentLocation == 0) {
+        updateLocation(0, 8);
+    } else if (currentLocation == 1) {
+        updateLocation(1, 7);
+    } else {
+        updateLocation(2, 12);
+    }
+}
+
 function recover() {
     if (hero.stamina <= 0) {
         description.innerHTML += '<br>Você não esta cansado.';
     } else {
-        description.innerHTML += '<br>Você decide dormir por hoje.';
+        description.innerHTML += '<br>Você decide dormir no relento por hoje.';
         hero.stamina = 0;
-        if (hero.health + 50 >= hero.maxHealth) {
+        hero.daysPlaying++;
+        currentDay.innerText = `- Dia ${hero.daysPlaying}`;
+        updtHeroStats();
+    }
+}
+
+function recoverHeal() {
+    if (hero.stamina <= 0) {
+        description.innerHTML += '<br>Você não esta cansado.';
+    } else if (hero.gold < 50) {
+        description.innerHTML += '<br>Você não tem ouro suficiente.';
+    } else {
+        description.innerHTML += '<br>Você decide pagar um quarto e dormir por hoje.';
+        hero.stamina = 0;
+        if (hero.health + 70 >= hero.maxHealth) {
             hero.health = hero.maxHealth;
         } else {
-            hero.health += 50;
+            hero.health += 70;
         }
+        hero.gold -= 50;
         hero.daysPlaying++;
         currentDay.innerText = `- Dia ${hero.daysPlaying}`;
         updtHeroStats();
@@ -520,15 +583,6 @@ function recover() {
 function getRandNumb() {
     let random = Math.floor(Math.random() * 10); 
     return random;
-}
-
-function gameOver() {
-    setTimeout(() => {
-        prologue.style.display = 'flex';
-        text.innerText = 'Você morreu!';
-        advance.innerText = 'Voltar'
-        advance.onclick = toStartAgain;
-    }, 1000);
 }
 
 // VILLAGE A
@@ -858,7 +912,7 @@ function buyBookSword2() {
     if (hero.gold >= 150) {
         buyBook('Livro Sobre Espada II', 4);
         hero.gold -= 150;
-        hero.damage += 10;
+        hero.damage += 6;
         updtHeroStats();
     } else {
         description.innerHTML += '<br>Você não tem ouro suficiente.';
@@ -869,7 +923,7 @@ function buyBookSword3() {
     if (hero.gold >= 150) {
         buyBook('Livro Sobre Espada III', 3);
         hero.gold -= 150;
-        hero.damage += 10;
+        hero.damage += 6;
         updtHeroStats();
     } else {
         description.innerHTML += '<br>Você não tem ouro suficiente.';
@@ -880,7 +934,7 @@ function buyBookSword4() {
     if (hero.gold >= 150) {
         buyBook('Livro Sobre Espada IV', 2);
         hero.gold -= 150;
-        hero.damage += 10;
+        hero.damage += 6;
         updtHeroStats();
     } else {
         description.innerHTML += '<br>Você não tem ouro suficiente.';
@@ -891,7 +945,7 @@ function buyBookBow1() {
     if (hero.gold >= 150) {
         buyBook('Livro Sobre Arco I', 4);
         hero.gold -= 150;
-        hero.arrowDmg += 10;
+        hero.arrowDmg += 6;
         hero.chanceToShoot--;
         updtHeroStats();
     } else {
@@ -903,7 +957,7 @@ function buyBookBow2() {
     if (hero.gold >= 150) {
         buyBook('Livro Sobre Arco II', 3);
         hero.gold -= 150;
-        hero.arrowDmg += 10;
+        hero.arrowDmg += 6;
         hero.chanceToShoot--;
         updtHeroStats();
     } else {
@@ -1055,6 +1109,7 @@ function monsterTurn() {
 
 function monsterSpecial() {
     let monsterDmg = monsters[currentMonsterFight].atk + getRandNumb() - hero.def - hero.level;
+    monsterDmg < 0 ? monsterDmg = 0 : monsterDmg;
     changeButtons(0, 5);
     setTimeout(() => {
         description.innerHTML += `<br>${monsters[currentMonsterFight].name} lhe atinge na cabeça.`;
@@ -1072,6 +1127,7 @@ function monsterSpecial() {
 
 function monsterAtk() {
     let monsterDmg = monsters[currentMonsterFight].atk + getRandNumb() - hero.def - hero.level;
+    monsterDmg < 0 ? monsterDmg = 0 : monsterDmg;
     changeButtons(0, 5);
     setTimeout(() => {
         description.innerHTML += `<br>${monsters[currentMonsterFight].name.replace('um', '')} lhe ataca.`;
@@ -1289,6 +1345,15 @@ function startGame() {
     updtHeroStats();
 }
 
+function gameOver() {
+    setTimeout(() => {
+        prologue.style.display = 'flex';
+        text.innerText = 'Você morreu!';
+        advance.innerText = 'Voltar'
+        advance.onclick = toStartAgain;
+    }, 1000);
+}
+
 function toSecondPart() {
     prologue.style.display = 'flex';
     text.textContent = 'Você derrotou o Lobo Selvagem Gigante fazendo com que ' +
@@ -1319,7 +1384,7 @@ function startFinalPart() {
 }
 
 function toStartAgain() {
-    location.href = '/./index.html';
+    window.location.href = '/./index.html';
 }
 
 function end() {
