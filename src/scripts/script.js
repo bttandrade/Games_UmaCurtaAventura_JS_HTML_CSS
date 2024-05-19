@@ -401,7 +401,7 @@ const monsters = [
         atk: 5,
         vida: 40,
         xp: 18,
-        gold: 8,
+        gold: 13,
     },
     {
         name: 'Lobo Selvagem Gigante',
@@ -415,14 +415,14 @@ const monsters = [
         atk: 12,
         vida: 60,
         xp: 28,
-        gold: 18,
+        gold: 23,
     },
     {
         name: 'Orc',
         atk: 20,
         vida: 100,
         xp: 48,
-        gold: 28,
+        gold: 38,
     },
     {
         name: 'Troll',
@@ -436,14 +436,14 @@ const monsters = [
         atk: 23,
         vida: 130,
         xp: 62,
-        gold: 42,
+        gold: 57,
     },
     {
         name: 'Esqueleto Arqueiro',
         atk: 32,
         vida: 90,
         xp: 74,
-        gold: 58,
+        gold: 78,
     },
     {
         name: 'Bruxo',
